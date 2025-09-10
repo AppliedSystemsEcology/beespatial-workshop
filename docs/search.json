@@ -1,0 +1,56 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to the BeeSpatial Tutorial",
+    "section": "",
+    "text": "BeeSpatial is a companion web application to Beescape. It provides researchers access to pollinator habitat quality indices that assess nesting suitability, floral resources, toxicity of potentially applied insecticides, and economic value of pollination. It also hosts base data layers on land cover and climate. Data are available from 2008 to the most recent available year.\nBeeSpatial can be used to query data commonly used when modeling the environemental drivers of species’ or commmunity responses.\nBeeSpatial allows users to extract:\n\nClimate data: monthly precipitation, min, and max temperature from PRISM\nCrop land covers: from the NASS CropLand Data Layer\nBeescape indices: spring forage, summer forage, fall forage, nesting, and pesticides",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "raster.html",
+    "href": "raster.html",
+    "title": "Get raster data",
+    "section": "",
+    "text": "Use BeeSpatial to download the cropland data layer (CDL) raster for Centre County, Pennsylvania for the year 2021."
+  },
+  {
+    "objectID": "raster.html#get-raster-data-from-beeshiny",
+    "href": "raster.html#get-raster-data-from-beeshiny",
+    "title": "Get raster data",
+    "section": "",
+    "text": "Use BeeSpatial to download the cropland data layer (CDL) raster for Centre County, Pennsylvania for the year 2021."
+  },
+  {
+    "objectID": "introgis.html",
+    "href": "introgis.html",
+    "title": "Necessary concepts and R packages",
+    "section": "",
+    "text": "This page serves as a brief overview of the GIS concepts and packages to get you up and running with the R-based modules in this tutorial. For more in-depth introduction GIS, you may want to look elsewhere on the web.",
+    "crumbs": [
+      "Necessary concepts and R packages"
+    ]
+  },
+  {
+    "objectID": "introgis.html#terms",
+    "href": "introgis.html#terms",
+    "title": "Necessary concepts and R packages",
+    "section": "Terms",
+    "text": "Terms\n\nraster: A form of geographic data that represents the landscape as a grid of cells. Grid values can be continuous values, signifying things like elevation, temperature, or spectral information (e.g. color) in a satellite image; or categorical values, signifying thematic classes like land cover.\nvector: Another form of geographic data that represents specific features on the landscape composed of discrete geometric locations that consist of x and y values. These can be points, lines, or polygons.\nCropland Data Layer (CDL): A set of raster datasets produced by the USDA National Agricultural Statistics (NASS) Service and Agricultural Research Service (ARS) that represents annual crop-specific land cover produced from satellite imagery and ground reference data.",
+    "crumbs": [
+      "Necessary concepts and R packages"
+    ]
+  },
+  {
+    "objectID": "introgis.html#load-necessary-packages",
+    "href": "introgis.html#load-necessary-packages",
+    "title": "Necessary concepts and R packages",
+    "section": "Load necessary packages",
+    "text": "Load necessary packages\nThere are a number of packages in R that are helpful in working with spatial data. For this workshop we will be using sf and terra. For data wrangling and visualizations we will use dplyr, ggplot2 and tidyterra.\n\n\n\nName\nDescription\nLink\n\n\n\n\ndplyr\nPackage that provides a ‘grammar’ of data manipulation in R\nhttps://dplyr.tidyverse.org/\n\n\nggplot2\nPackage that provides a system for declaratively creating graphics\nhttps://ggplot2.tidyverse.org/\n\n\nsf\nPackage for manipulating 2-D geographic vector data\nhttps://r-spatial.github.io/sf/\n\n\nterra\nPackage for spatial data analysis\nhttps://rspatial.github.io/terra/\n\n\ntidyterra\nPackage for integrating objects from terra with the dplyr and ggplot2 packages\nhttps://dieghernan.github.io/tidyterra/\n\n\n\nBecause some spatial functions have the same names as dplyr functions it is helpful to load the spatial packages last. We can also use the :: to specify the package for function calls.\nUnhash (remove the preceding #) and use install.packages for any packages your may not already have installed\n\n# install.packages(\"dplyr\", dependencies = TRUE)\n# install.packages(\"ggplot2\", dependencies = TRUE)\n# install.packages(\"sf\", dependencies = TRUE)\n# install.packages(\"terra\", dependencies = TRUE)\n# install.packages(\"tidyterra\", dependencies = TRUE)\n\nlibrary(dplyr)\nlibrary(ggplot2)\nlibrary(sf)\nlibrary(terra)\nlibrary(tidyterra)",
+    "crumbs": [
+      "Necessary concepts and R packages"
+    ]
+  }
+]
