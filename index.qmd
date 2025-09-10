@@ -1,0 +1,5 @@
+---
+title: "Welcome to the Eco-Spatial Workshop"
+format: html
+editor: visual
+---

@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Eco-Spatial Workshop"
+  sidebar:
+    style: docked
+    contents:
+      - text: "Welcome"
+        file: index.qmd
+      - section: "Getting Started"
+        contents: 
+          - introgis.qmd
+          - beespatial.qmd
+      - section: "Part 1: Data prep"
+        contents: 
+          - raster.qmd
+
+format:
+  html:
+    theme: cosmos
+    toc: true
