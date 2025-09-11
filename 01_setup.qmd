@@ -8,3 +8,12 @@ format: html
   - Install packages/setup environment
   - Where to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE
   - Downloading/cloning the github repo
+
+## `renv`
+
+For this workshop we will use the `renv` package to create a reproducible R environment. To initialize the environment first install the `renv` package and then run `renv::restore()` to install all of the packages we will use in this workshop.
+
+```{r}
+install.packages("renv")
+renv::restore()
+```
