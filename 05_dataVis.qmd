@@ -1,0 +1,6 @@
+---
+title: "Mapping"
+format: html
+---
+
+  - generate a map with ggplot/tidyterra

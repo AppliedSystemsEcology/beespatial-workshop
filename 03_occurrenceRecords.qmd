@@ -1,0 +1,8 @@
+---
+title: "Occurrence Records"
+format: html
+---
+
+  - `rgbif` to download records
+  -  Simple filtering/removing duplicates
+  -  Extract features at each point

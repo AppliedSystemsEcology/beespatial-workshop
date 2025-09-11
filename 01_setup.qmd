@@ -1,0 +1,10 @@
+---
+title: "Setup your R environment"
+format: html
+---
+
+# Setup
+
+  - Install packages/setup environment
+  - Where to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE
+  - Downloading/cloning the github repo

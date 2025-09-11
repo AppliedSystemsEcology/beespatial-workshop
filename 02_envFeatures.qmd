@@ -1,0 +1,9 @@
+---
+title: "Study Area and Environmental Features"
+format: html
+---
+
+  - NaturalEarthHires (or just read in shp) for Oregon
+  - BeeSpatial walkthrough
+  - `rlandfire` for additional layers
+  - Aggregation and transformation
