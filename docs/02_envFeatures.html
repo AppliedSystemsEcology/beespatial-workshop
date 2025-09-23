@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Concepts and R packages – Eco-Spatial Workshop</title>
+<title>Study Area and Environmental Features – Eco-Spatial Workshop</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -115,7 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introgis.html">Getting Started</a></li><li class="breadcrumb-item"><a href="./introgis.html">Concepts and R packages</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      Eco-Spatial Workshop
+      </li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -157,7 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./introgis.html" class="sidebar-item-text sidebar-link active">
+  <a href="./introgis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Concepts and R packages</span></a>
   </div>
 </li>
@@ -191,22 +158,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#terms" id="toc-terms" class="nav-link active" data-scroll-target="#terms">Terms</a></li>
-  <li><a href="#load-necessary-packages" id="toc-load-necessary-packages" class="nav-link" data-scroll-target="#load-necessary-packages">Load necessary packages</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introgis.html">Getting Started</a></li><li class="breadcrumb-item"><a href="./introgis.html">Concepts and R packages</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Concepts and R packages</h1>
+<h1 class="title">Study Area and Environmental Features</h1>
 </div>
 
 
@@ -223,72 +183,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This page serves as a brief overview of the GIS concepts and packages to get you up and running with the R-based modules in this tutorial. For more in-depth introduction GIS, you may want to look <a href="https://www.ecologi.st/spatial-r/">elsewhere</a> on the <a href="https://bookdown.org/michael_bcalles/gis-crash-course-in-r/">web</a>.</p>
-<section id="terms" class="level2">
-<h2 class="anchored" data-anchor-id="terms">Terms</h2>
 <ul>
-<li><strong>raster:</strong> A form of geographic data that represents the landscape as a grid of cells. Grid values can be continuous values, signifying things like elevation, temperature, or spectral information (e.g.&nbsp;color) in a satellite image; or categorical values, signifying thematic classes like land cover.</li>
-<li><strong>vector:</strong> Another form of geographic data that represents specific features on the landscape composed of discrete geometric locations that consist of x and y values. These can be points, lines, or polygons.</li>
-<li><strong>Cropland Data Layer (CDL):</strong> A set of raster datasets produced by the USDA National Agricultural Statistics (NASS) Service and Agricultural Research Service (ARS) that represents annual crop-specific land cover produced from satellite imagery and ground reference data.</li>
+<li>NaturalEarthHires (or just read in shp) for Oregon</li>
+<li>BeeSpatial walkthrough</li>
+<li><code>rlandfire</code> for additional layers</li>
+<li>Aggregation and transformation</li>
 </ul>
-</section>
-<section id="load-necessary-packages" class="level2">
-<h2 class="anchored" data-anchor-id="load-necessary-packages">Load necessary packages</h2>
-<p>There are a number of packages in R that are helpful in working with spatial data. For this workshop we will be using <code>sf</code> and <code>terra</code>. For data wrangling and visualizations we will use <code>dplyr</code>, <code>ggplot2</code> and <code>tidyterra</code>.</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: left;">Link</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><code>dplyr</code></td>
-<td style="text-align: left;">Package that provides a ‘grammar’ of data manipulation in <code>R</code></td>
-<td style="text-align: left;"><a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>ggplot2</code></td>
-<td style="text-align: left;">Package that provides a system for declaratively creating graphics</td>
-<td style="text-align: left;"><a href="https://ggplot2.tidyverse.org/" class="uri">https://ggplot2.tidyverse.org/</a></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>sf</code></td>
-<td style="text-align: left;">Package for manipulating 2-D geographic vector data</td>
-<td style="text-align: left;"><a href="https://r-spatial.github.io/sf/" class="uri">https://r-spatial.github.io/sf/</a></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>terra</code></td>
-<td style="text-align: left;">Package for spatial data analysis</td>
-<td style="text-align: left;"><a href="https://rspatial.github.io/terra/" class="uri">https://rspatial.github.io/terra/</a></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>tidyterra</code></td>
-<td style="text-align: left;">Package for integrating objects from <code>terra</code> with the <code>dplyr</code> and <code>ggplot2</code> packages</td>
-<td style="text-align: left;"><a href="https://dieghernan.github.io/tidyterra/" class="uri">https://dieghernan.github.io/tidyterra/</a></td>
-</tr>
-</tbody>
-</table>
-<p>Because some spatial functions have the same names as dplyr functions it is helpful to load the spatial packages last. We can also use the <code>::</code> to specify the package for function calls.</p>
-<p>Unhash (remove the preceding <code>#</code>) and use install.packages for any packages your may not already have installed</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("dplyr", dependencies = TRUE)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggplot2", dependencies = TRUE)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("sf", dependencies = TRUE)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("terra", dependencies = TRUE)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyterra", dependencies = TRUE)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyterra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

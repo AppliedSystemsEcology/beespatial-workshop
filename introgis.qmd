@@ -19,7 +19,7 @@ This page serves as a brief overview of the GIS concepts and packages to get you
 There are a number of packages in R that are helpful in working with spatial data. For this workshop we will be using `sf` and `terra`. For data wrangling and visualizations we will use `dplyr`, `ggplot2` and `tidyterra`.
 
 | Name | Description | Link |
-|:-----------------------|:-----------------------|:-----------------------|
+|:---|:---|:---|
 | `dplyr` | Package that provides a 'grammar' of data manipulation in `R` | <https://dplyr.tidyverse.org/> |
 | `ggplot2` | Package that provides a system for declaratively creating graphics | <https://ggplot2.tidyverse.org/> |
 | `sf` | Package for manipulating 2-D geographic vector data | <https://r-spatial.github.io/sf/> |
