@@ -8,14 +8,17 @@ website:
     style: docked
     contents:
       - text: "Welcome"
-        file: index.qmd
-      - section: "Getting Started"
-        contents: 
-          - introgis.qmd
-          - beespatial.qmd
-      - section: "Part 1: Data prep"
-        contents: 
-          - raster.qmd
+        href: index.qmd
+      - text: "1 Setup"
+        href: 01_setup.qmd
+      - text: "2 Environmental features"
+        href: 02_envFeatures.qmd
+      - text: "3 Occurrence records"
+        href: 03_occurrenceRecords.qmd
+      - text: "4 Fitting a model"
+        href: 04_modelFit.qmd
+      - text: "5 Data visualization"
+        href: 05_dataVis.qmd
 
 format:
   html:

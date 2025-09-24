@@ -6,3 +6,44 @@ format: html
   - `rgbif` to download records
   -  Simple filtering/removing duplicates
   -  Extract features at each point
+  
+## Using `rgbif` to get occurence records
+
+The package `rgbif` enables you to access GBIF's API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.
+  
+### Set up GBIF credentials
+
+To download from GBIF, you need to register and supply your registration credentials.
+
+More on this [here](https://docs.ropensci.org/rgbif/articles/gbif_credentials.html)
+
+```{r}
+#| eval: false
+# install.packages("usethis")
+
+usethis::edit_r_environ()
+
+```
+
+This will bring up a file called **.Renviron**. Add your credential information here (replace with your info).
+
+```{r}
+#| eval: false
+
+GBIF_USER="fakeuser"
+GBIF_PWD="safe_fake_password_123"
+GBIF_EMAIL="fakeuser@gbif.org"
+
+```
+
+### Set up an `rgbif` query
+
+There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:
+
+- Has geographic coordinates
+- Has no geospatial issues
+- Has acceptable geospatial coordinate accuracy
+- Represents the presence of the target organism
+- Within our desired time range
+- Represents a human observation
+
