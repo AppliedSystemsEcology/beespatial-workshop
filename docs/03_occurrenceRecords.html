@@ -186,9 +186,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#using-rgbif-to-get-occurence-records" id="toc-using-rgbif-to-get-occurence-records" class="nav-link active" data-scroll-target="#using-rgbif-to-get-occurence-records">Using <code>rgbif</code> to get occurence records</a>
+  <li><a href="#using-rgbif-to-get-occurrence-records" id="toc-using-rgbif-to-get-occurrence-records" class="nav-link active" data-scroll-target="#using-rgbif-to-get-occurrence-records">Using <code>rgbif</code> to get occurrence records</a>
   <ul class="collapse">
   <li><a href="#set-up-gbif-credentials" id="toc-set-up-gbif-credentials" class="nav-link" data-scroll-target="#set-up-gbif-credentials">Set up GBIF credentials</a></li>
+  <li><a href="#getting-the-gbif-taxon-key" id="toc-getting-the-gbif-taxon-key" class="nav-link" data-scroll-target="#getting-the-gbif-taxon-key">Getting the GBIF taxon key</a></li>
   <li><a href="#set-up-an-rgbif-query" id="toc-set-up-an-rgbif-query" class="nav-link" data-scroll-target="#set-up-an-rgbif-query">Set up an <code>rgbif</code> query</a></li>
   </ul></li>
   </ul>
@@ -221,8 +222,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Simple filtering/removing duplicates</li>
 <li>Extract features at each point</li>
 </ul>
-<section id="using-rgbif-to-get-occurence-records" class="level2">
-<h2 class="anchored" data-anchor-id="using-rgbif-to-get-occurence-records">Using <code>rgbif</code> to get occurence records</h2>
+<section id="using-rgbif-to-get-occurrence-records" class="level2">
+<h2 class="anchored" data-anchor-id="using-rgbif-to-get-occurrence-records">Using <code>rgbif</code> to get occurrence records</h2>
 <p>The package <code>rgbif</code> enables you to access GBIF’s API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.</p>
 <section id="set-up-gbif-credentials" class="level3">
 <h3 class="anchored" data-anchor-id="set-up-gbif-credentials">Set up GBIF credentials</h3>
@@ -240,6 +241,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>GBIF_EMAIL<span class="ot">=</span><span class="st">"fakeuser@gbif.org"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="getting-the-gbif-taxon-key" class="level3">
+<h3 class="anchored" data-anchor-id="getting-the-gbif-taxon-key">Getting the GBIF taxon key</h3>
+<p>Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function <code>rgbif::name_backbone()</code> to identify the GBIF taxon key that will return precise taxon matches.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rgbif<span class="sc">::</span><span class="fu">name_backbone</span>(<span class="st">"Bombus sitkensis"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 22
+  usageKey scientificName        canonicalName rank  status confidence matchType
+*    &lt;int&gt; &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;    
+1  1340328 Bombus sitkensis Nyl… Bombus sitke… SPEC… ACCEP…         97 EXACT    
+# ℹ 15 more variables: kingdom &lt;chr&gt;, phylum &lt;chr&gt;, order &lt;chr&gt;, family &lt;chr&gt;,
+#   genus &lt;chr&gt;, species &lt;chr&gt;, kingdomKey &lt;int&gt;, phylumKey &lt;int&gt;,
+#   classKey &lt;int&gt;, orderKey &lt;int&gt;, familyKey &lt;int&gt;, genusKey &lt;int&gt;,
+#   speciesKey &lt;int&gt;, class &lt;chr&gt;, verbatim_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>The taxon key for <em>Bombus sitkensis</em> is 1340328.</p>
+</section>
 <section id="set-up-an-rgbif-query" class="level3">
 <h3 class="anchored" data-anchor-id="set-up-an-rgbif-query">Set up an <code>rgbif</code> query</h3>
 <p>There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:</p>
@@ -248,9 +267,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Has no geospatial issues</li>
 <li>Has acceptable geospatial coordinate accuracy</li>
 <li>Represents the presence of the target organism</li>
-<li>Within our desired time range</li>
+<li>Within a desired time range</li>
 <li>Represents a human observation</li>
+<li>Is within our focal geographic extent</li>
 </ul>
+<p>The GBIF API has specific search terms (called ‘predicates’ in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hasCoordinate <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hasGeospatialIssue <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>coordinateUncertaintyInMeters <span class="ot">&lt;-</span> <span class="st">"0,120"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>occurrenceStatus <span class="ot">&lt;-</span> <span class="st">"PRESENT"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="st">"2015,2025"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>basisOfRecord <span class="ot">&lt;-</span> <span class="st">"OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>stateProvince <span class="ot">&lt;-</span> <span class="st">"Oregon"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>country <span class="ot">&lt;-</span> <span class="st">"US"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can use the function <code>rgbif::occ_count()</code> to preview how many GBIF records we will return if we use these search terms.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rgbif<span class="sc">::</span><span class="fu">occ_count</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">taxonKey =</span> <span class="fl">1340328.</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasCoordinate =</span> hasCoordinate,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasGeospatialIssue =</span> hasGeospatialIssue,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coordinateUncertaintyInMeters =</span> coordinateUncertaintyInMeters,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">occurrenceStatus =</span> occurrenceStatus,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> year,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">basisOfRecord =</span> basisOfRecord,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateProvince =</span> stateProvince,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> country</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 204</code></pre>
+</div>
+</div>
 
 
 </section>
