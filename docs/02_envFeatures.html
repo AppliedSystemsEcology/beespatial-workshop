@@ -187,15 +187,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#objectives" id="toc-objectives" class="nav-link active" data-scroll-target="#objectives">Objectives</a></li>
-  <li><a href="#landscape-data-resources" id="toc-landscape-data-resources" class="nav-link" data-scroll-target="#landscape-data-resources">Landscape data resources</a></li>
+  <li><a href="#landscape-data-resources" id="toc-landscape-data-resources" class="nav-link" data-scroll-target="#landscape-data-resources">Landscape data resources</a>
+  <ul class="collapse">
   <li><a href="#beespatial" id="toc-beespatial" class="nav-link" data-scroll-target="#beespatial">BeeSpatial</a>
   <ul class="collapse">
   <li><a href="#download-beespatial-data" id="toc-download-beespatial-data" class="nav-link" data-scroll-target="#download-beespatial-data">Download BeeSpatial data</a></li>
-  <li><a href="#load-the-downloaded-beespatial-data" id="toc-load-the-downloaded-beespatial-data" class="nav-link" data-scroll-target="#load-the-downloaded-beespatial-data">Load the downloaded BeeSpatial data</a></li>
+  <li><a href="#load-the-downloaded-data" id="toc-load-the-downloaded-data" class="nav-link" data-scroll-target="#load-the-downloaded-data">Load the downloaded data</a></li>
+  <li><a href="#change-the-projection" id="toc-change-the-projection" class="nav-link" data-scroll-target="#change-the-projection">Change the projection</a></li>
   </ul></li>
   <li><a href="#rlandfire" id="toc-rlandfire" class="nav-link" data-scroll-target="#rlandfire"><code>rlandfire</code></a>
   <ul class="collapse">
   <li><a href="#download-rlandfire-data" id="toc-download-rlandfire-data" class="nav-link" data-scroll-target="#download-rlandfire-data">Download <code>rlandfire</code> data</a></li>
+  <li><a href="#load-the-downloaded-data-1" id="toc-load-the-downloaded-data-1" class="nav-link" data-scroll-target="#load-the-downloaded-data-1">Load the downloaded data</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#data-aggregation-and-cleaning" id="toc-data-aggregation-and-cleaning" class="nav-link" data-scroll-target="#data-aggregation-and-cleaning">Data aggregation and cleaning</a>
+  <ul class="collapse">
+  <li><a href="#prepare-model-inputs" id="toc-prepare-model-inputs" class="nav-link" data-scroll-target="#prepare-model-inputs">Prepare model inputs</a>
+  <ul class="collapse">
+  <li><a href="#data-aggregation-calculate-annual-mean-temperature" id="toc-data-aggregation-calculate-annual-mean-temperature" class="nav-link" data-scroll-target="#data-aggregation-calculate-annual-mean-temperature">Data aggregation: Calculate annual mean temperature</a></li>
+  <li><a href="#data-aggregation-calculate-mean-annual-precipitation-prmean" id="toc-data-aggregation-calculate-mean-annual-precipitation-prmean" class="nav-link" data-scroll-target="#data-aggregation-calculate-mean-annual-precipitation-prmean">Data aggregation: Calculate mean annual precipitation <code>prmean</code></a></li>
+  </ul></li>
+  <li><a href="#make-model-input-layers-align" id="toc-make-model-input-layers-align" class="nav-link" data-scroll-target="#make-model-input-layers-align">Make model input layers align</a>
+  <ul class="collapse">
+  <li><a href="#resample" id="toc-resample" class="nav-link" data-scroll-target="#resample">Resample</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -222,22 +238,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="objectives" class="level2">
-<h2 class="anchored" data-anchor-id="objectives">Objectives</h2>
+<section id="objectives" class="level1">
+<h1>Objectives</h1>
 <ul>
 <li><p>Identify some landscape online data resources that can be used for insect distribution mapping</p></li>
 <li><p>Load GIS data layers into R and clean and visualize them in preparation for modeling</p></li>
 </ul>
 </section>
-<section id="landscape-data-resources" class="level2">
-<h2 class="anchored" data-anchor-id="landscape-data-resources">Landscape data resources</h2>
-<p>We’ll be download data using two different resources that serve landscape data to researchers:</p>
+<section id="landscape-data-resources" class="level1">
+<h1>Landscape data resources</h1>
+<p>We’ll be downloading data using two different resources that serve landscape data to researchers:</p>
 <ul>
 <li><p><a href="https://beesuite.psu.edu/beespatial/">BeeSpatial</a> - A portal to access research data layers and summaries that extends the information presented on the <a href="https://beescape.psu.edu/">Beescape app</a></p></li>
 <li><p><a href="https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html"><code>rlandfire</code></a> - an R package that provides access to a diverse suite of spatial data layers from <a href="https://landfire.gov/">LANDFIRE</a>, that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.</p></li>
 </ul>
 <p>These resources take two different approaches to serving data, as you’ll see.</p>
-</section>
 <section id="beespatial" class="level2">
 <h2 class="anchored" data-anchor-id="beespatial">BeeSpatial</h2>
 <section id="download-beespatial-data" class="level3">
@@ -245,13 +260,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>BeeSpatial has a point-and-click graphical user interface. We will use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the <strong>Select geographic boundaries</strong> option in the <strong>Select locations</strong> step. <a href="https://climateecology.github.io/beespatial-tutorial/">More information on using BeeSpatial can be found here.</a></p>
 <p><img src="media/beespatial_loc.jpg" class="img-fluid" alt="BeeSpatial interface. Preparing to download statewide rasters for Oregon."> For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:</p>
 <ul>
-<li>Maximum and minimum temperatures for 2015-2023</li>
-<li>Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023</li>
-<li>Pollinator nesting resources at 5km range for 2015-2023</li>
+<li>Monthly maximum and minimum temperatures for 2020</li>
+<li>Monthly total precipitation for 2020</li>
+<li><del><em>Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023</em></del></li>
+<li><del><em>Pollinator nesting resources at 5km range for 2015-2023</em></del></li>
 </ul>
 </section>
-<section id="load-the-downloaded-beespatial-data" class="level3">
-<h3 class="anchored" data-anchor-id="load-the-downloaded-beespatial-data">Load the downloaded BeeSpatial data</h3>
+<section id="load-the-downloaded-data" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-downloaded-data">Load the downloaded data</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -260,8 +276,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>downloadpath <span class="ot">&lt;-</span> <span class="st">"download/Oregon_raster_data/"</span>   <span class="co"># change to your download location</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>tmin <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath,<span class="st">"tmin_2020_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tmax <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath,<span class="st">"tmax_2020_STATE_FIPS_41.tif"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tmax <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath,<span class="st">"tmax_2020_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>pr <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath, <span class="st">"pr_2020_STATE_FIPS_41.tif"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>If we take a look at one of the downloaded climate datasets:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatRaster 
+size        : 103, 194, 12  (nrow, ncol, nlyr)
+resolution  : 0.04166667, 0.04166667  (x, y)
+extent      : -124.5625, -116.4792, 41.97917, 46.27083  (xmin, xmax, ymin, ymax)
+coord. ref. : lon/lat NAD83 (EPSG:4269) 
+source      : pr_2020_STATE_FIPS_41.tif 
+names       : pr202001, pr202002, pr202003, pr202004, pr202005, pr202006, ... 
+min values  :    9.680,    0.000,    8.370,    1.783,    7.118,    0.000, ... 
+max values  : 1598.803,  816.065,  365.797,  335.101,  460.783,  312.381, ... </code></pre>
+</div>
+</div>
+<p>Notice that the downloaded climate data is in geographic coordinates, which is designed for a sphere and uses angles to indicate location and distance. Note that the resolution of each pixel is <code>0.04166667, 0.04166667  (x, y)</code>. These values are in units of degrees. We want to change this to a projected coordinate system, which represents consistent units on the ground and matches with the LANDFIRE data.</p>
+</section>
+<section id="change-the-projection" class="level3">
+<h3 class="anchored" data-anchor-id="change-the-projection">Change the projection</h3>
+<p>We’re going to use the <a href="https://epsg.io/32610">Universal Transverse Mercator (UTM) zone 10N projection</a>, which works well for the state of Oregon.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tmin <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(tmin, <span class="st">"epsg:32610"</span>)   <span class="co"># 32610 indicates the EPSG code for UTM 10N</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tmax <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(tmax, <span class="st">"epsg:32610"</span>) </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pr <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(pr, <span class="st">"epsg:32610"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>pr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatRaster 
+size        : 136, 183, 12  (nrow, ncol, nlyr)
+resolution  : 3658.236, 3658.236  (x, y)
+extent      : 370553.5, 1040011, 4647323, 5144843  (xmin, xmax, ymin, ymax)
+coord. ref. : WGS 84 / UTM zone 10N (EPSG:32610) 
+source(s)   : memory
+names       :   pr202001, pr202002,   pr202003,   pr202004,  pr202005,     pr202006, ... 
+min values  :   10.12199,   0.0000,   8.673513,   2.089378,   7.87682, 1.932672e-03, ... 
+max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e+02, ... </code></pre>
+</div>
+</div>
+<p>Now looking at the attributes of the climate data, we see that the resolution value is much larger (<code>3658.236, 3658.236  (x, y)</code>). This is because they are now in units of meters. Each pixel of this raster has resolution of roughly 4km. We will use this as a template for the LANDFIRE data layers, since this is our coarsest resolution layer.</p>
 </section>
 </section>
 <section id="rlandfire" class="level2">
@@ -271,21 +327,181 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We will use <code>rlandfire</code> to get additional landscape data:</p>
 <ul>
 <li>Elevation</li>
-<li>Vegetation cover</li>
+<li><del><em>Vegetation cover</em></del></li>
 </ul>
 <p>See the <a href="https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html"><code>rlandfire</code> tutorial</a> for more background about these steps.</p>
-<p>As a first step, load the package and use one of our raster layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the landfire data.</p>
+<p>As a first step, load the package and use one of the climate layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the LANDFIRE data. We can use the <code>rlandfire</code> function <code>getAOI</code> to do this.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlandfire)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlandfire)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> <span class="fu">getAOI</span>(tmin)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>aoi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -124.68530   41.79367 -115.99465   46.44474</code></pre>
 </div>
+</div>
+<p>The AOI is specified in geographic coordinates, with is what is required by the LANDFIRE API that <code>rlandfire</code> is talking to.</p>
+<p>To request layers using <code>rlandfire</code> we have to specify the LANDFIRE products using their abbreviated names. The layers can be viewed <a href="https://lfps.usgs.gov/products">here</a>, which is also accessible using the package function <code>rlandfire::viewProducts()</code>. We will be selecting the elevation layer:</p>
 <ul>
-<li>NaturalEarthHires (or just read in shp) for Oregon</li>
-<li>BeeSpatial walkthrough</li>
-<li><code>rlandfire</code> for additional layers</li>
-<li>Aggregation and transformation</li>
+<li><code>ELEV2020</code> = 2020 elevation</li>
+<li><code>200EVH</code> = existing vegetation height (not used)</li>
 </ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>products <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ELEV2020"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># additional parameters</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>email <span class="ot">&lt;-</span> <span class="st">"rlandfire@example.com"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>lfpath <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">getwd</span>(),<span class="st">"/download/lf.zip"</span>)   <span class="co"># change to your FULL download path</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>projection <span class="ot">&lt;-</span> <span class="dv">32610</span>                            <span class="co"># UTM 10N</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>resolution <span class="ot">&lt;-</span> <span class="fu">res</span>(tmin)[<span class="dv">1</span>]                     <span class="co"># match climate data resolution</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>resp <span class="ot">&lt;-</span> <span class="fu">landfireAPIv2</span>(<span class="at">products =</span> products,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">aoi =</span> aoi, </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">projection =</span> projection,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resolution =</span> resolution,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">email =</span> email,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">path =</span> lfpath,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-the-downloaded-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-downloaded-data-1">Load the downloaded data</h3>
+<p>In order to load the layer into R, unzip the file at the location you indicated in <code>lfpath</code>. We want the file with the extension ‘.tif’. The filename produced is long, so we’ve renamed it to ‘elevation.tif’ in these directions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>elev <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath, <span class="st">"elevation.tif"</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(elev)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Elevation data from LANDFIRE.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="data-aggregation-and-cleaning" class="level1">
+<h1>Data aggregation and cleaning</h1>
+<p>We need to prepare these data layers for analysis. This means:</p>
+<ol type="1">
+<li>We need the layers to represent the desired inputs of our species distribution model.<br>
+</li>
+<li>We need the pixels of each layer to match with the corresponding pixels in the other layers.</li>
+</ol>
+<section id="prepare-model-inputs" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-model-inputs">Prepare model inputs</h2>
+<p>For our species distribution model, we are planning to use <strong>mean precipitation</strong>, <strong>mean temperature</strong>, and <strong>elevation</strong> as inputs. We already have elevation.</p>
+<p>Let’s look at the climate data from BeeSpatial. This data originates from the <a href="https://prism.oregonstate.edu/">PRISM group</a>, which produces weather raster layers from climate station data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Contents of the minimum temperature raster.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>As you can see, this data is comprised of 12 layers. Each layer represents the minimum temperature for the month indicated by the last two digits of the layer name, e.g., May of 2020: “tmin202005”. What we want, however, is the mean temperature over the whole year. To get this, we will perform some aggregation.</p>
+<section id="data-aggregation-calculate-annual-mean-temperature" class="level3">
+<h3 class="anchored" data-anchor-id="data-aggregation-calculate-annual-mean-temperature">Data aggregation: Calculate annual mean temperature</h3>
+<p>To get a mean annual temperature raster, we will combine the monthly min (<strong>tmin</strong>) and max (<strong>tmax</strong>) temperature layers in this way:</p>
+<ol type="1">
+<li>Average <strong>tmin</strong> and <strong>tmax</strong> pixels for each month to get a monthly mean –&gt; <strong>tmean_mon</strong></li>
+<li>Average monthly means across the year to get the average temperature for the year –&gt; *tmean_yr**</li>
+</ol>
+<section id="calculate-monthly-mean-temperature-tmean_mon" class="level4">
+<h4 class="anchored" data-anchor-id="calculate-monthly-mean-temperature-tmean_mon">1. Calculate monthly mean temperature <code>tmean_mon</code></h4>
+<p>We can calculate the monthly average for each month by simply adding the <strong>tmin</strong> and <strong>tmax</strong> rasters and dividing by two. This is possible because these rasters’ layers match so that the first layer (January) of <strong>tmin</strong> is added to the first layer of <strong>tmax</strong> and divided by two, etc.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tmean_mon <span class="ot">&lt;-</span> (tmin <span class="sc">+</span> tmax)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_mon)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Calculated mean monthly temperature. The layer names are inherited from tmin.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-annual-mean-temperature-tmean_yr" class="level4">
+<h4 class="anchored" data-anchor-id="calculate-annual-mean-temperature-tmean_yr">2. Calculate annual mean temperature <code>tmean_yr</code></h4>
+<p>We simply use <code>mean()</code> to calculate the mean across month layers in the <strong>tmean_mon</strong> raster.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tmean_yr <span class="ot">&lt;-</span> <span class="fu">mean</span>(tmean_mon)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_yr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Calculated mean annual temperature.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="data-aggregation-calculate-mean-annual-precipitation-prmean" class="level3">
+<h3 class="anchored" data-anchor-id="data-aggregation-calculate-mean-annual-precipitation-prmean">Data aggregation: Calculate mean annual precipitation <code>prmean</code></h3>
+<p>Calculating the mean annual precipitation (<code>prmean</code>) uses the same approach as calculating the mean annual temperature from monthly means.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>prmean <span class="ot">&lt;-</span> <span class="fu">mean</span>(pr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="make-model-input-layers-align" class="level2">
+<h2 class="anchored" data-anchor-id="make-model-input-layers-align">Make model input layers align</h2>
+<p>To overlay these raster day from different sources, we need to check if they have the same <strong>projection</strong>, <strong>resolution</strong>, and <strong>alignment</strong>.</p>
+<p>Check if the climate data and LANDFIRE data have the same projection. We’re only using <code>prmean</code> for the climate data, since we know they’re all from the same source.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(<span class="fu">crs</span>(prmean), <span class="fu">crs</span>(elev))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>We expected the projection to be the same because we requested a specific projection in <code>rlandfire</code>.</p>
+<p>Check if the resolution is the same.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elev))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean relative difference: 6.449424e-05"</code></pre>
+</div>
+</div>
+<p>It looks like there’s a small difference resolution. If you compare the actual values of the climate data (<code>res(prmean)</code>) and elevation (<code>res(elev)</code>), it looks like the LANDFIRE layer only matches the climate layer resolution to the nearest whole number. This means that these layers also don’t align over their extents.</p>
+<section id="resample" class="level3">
+<h3 class="anchored" data-anchor-id="resample">Resample</h3>
+<p>To make these layers’ resolution match and their pixels align, we will use resampling. This means transferring the raster data to a new pixel grid. We will do this by matching the <code>elev</code> raster grid to that of the climate datasets. To translate the data to the new grid, we will use the <strong>nearest neighbor function</strong>, which simply assigns pixel values to the new grid based on the value of the nearest pixel value from the old grid. There are other options that use continuous interpolation but we’re keeping it simple for this workshop.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>elev2 <span class="ot">&lt;-</span> <span class="fu">resample</span>(elev,            <span class="co"># layer to be resampled</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                  prmean,          <span class="co"># target grid to base resampling on</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"near"</span>  <span class="co"># method is nearest neighbor</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can check if these layers share the same resolution:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elev2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>And if their extents are the same:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">ext</span>(prmean), <span class="fu">ext</span>(elev2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 </section>
 
