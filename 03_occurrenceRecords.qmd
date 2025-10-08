@@ -37,7 +37,7 @@ GBIF_EMAIL="fakeuser@gbif.org"
 ```
 
 
-### Getting the GBIF taxon key
+### Get the GBIF taxon key
 
 Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function `rgbif::name_backbone()` to identify the GBIF taxon key that will return precise taxon matches.
 

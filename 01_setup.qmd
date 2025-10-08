@@ -11,9 +11,19 @@ format: html
 
 ## `renv`
 
-For this workshop we will use the `renv` package to create a reproducible R environment. To initialize the environment first install the `renv` package and then run `renv::restore()` to install all of the packages we will use in this workshop.
+For this workshop we will use the `renv` package to create a reproducible R environment. To initialize the environment first install the `renv` package.
 
 ```{r}
+#| eval: false
+
 install.packages("renv")
+
+```
+
+Then run `renv::restore()` to install all of the packages we will use in this workshop.
+
+```{r}
+
 renv::restore()
+
 ```

@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#using-rgbif-to-get-occurrence-records" id="toc-using-rgbif-to-get-occurrence-records" class="nav-link active" data-scroll-target="#using-rgbif-to-get-occurrence-records">Using <code>rgbif</code> to get occurrence records</a>
   <ul class="collapse">
   <li><a href="#set-up-gbif-credentials" id="toc-set-up-gbif-credentials" class="nav-link" data-scroll-target="#set-up-gbif-credentials">Set up GBIF credentials</a></li>
-  <li><a href="#getting-the-gbif-taxon-key" id="toc-getting-the-gbif-taxon-key" class="nav-link" data-scroll-target="#getting-the-gbif-taxon-key">Getting the GBIF taxon key</a></li>
+  <li><a href="#get-the-gbif-taxon-key" id="toc-get-the-gbif-taxon-key" class="nav-link" data-scroll-target="#get-the-gbif-taxon-key">Get the GBIF taxon key</a></li>
   <li><a href="#set-up-an-rgbif-query" id="toc-set-up-an-rgbif-query" class="nav-link" data-scroll-target="#set-up-an-rgbif-query">Set up an <code>rgbif</code> query</a></li>
   </ul></li>
   </ul>
@@ -241,8 +241,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>GBIF_EMAIL<span class="ot">=</span><span class="st">"fakeuser@gbif.org"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="getting-the-gbif-taxon-key" class="level3">
-<h3 class="anchored" data-anchor-id="getting-the-gbif-taxon-key">Getting the GBIF taxon key</h3>
+<section id="get-the-gbif-taxon-key" class="level3">
+<h3 class="anchored" data-anchor-id="get-the-gbif-taxon-key">Get the GBIF taxon key</h3>
 <p>Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function <code>rgbif::name_backbone()</code> to identify the GBIF taxon key that will return precise taxon matches.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rgbif<span class="sc">::</span><span class="fu">name_backbone</span>(<span class="st">"Bombus sitkensis"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

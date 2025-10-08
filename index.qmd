@@ -1,5 +1,21 @@
 ---
-title: "Welcome to the Eco-Spatial Workshop"
+title: "Welcome to the Eco-Spatial Workshop!"
 format: html
 editor: visual
 ---
+
+This website is the online material for the workshop **An Introduction to Eco-spatial Data in R: Accessing, Visualizing, and Applying Machine Learning** at [**Entomology 2025**](https://www.entsoc.org/events/annual-meeting).
+
+## Workshop Objectives
+
+By the end of this course, attendees will be able to:
+
+-   Identify some landscape online data resources that can be used for insect distribution mapping
+
+-   Load GIS data layers into R and clean and visualize them in preparation for modeling
+
+-   Use an R package to search for and download georeferenced citizen science observation records from the [Global Biodiversity Information Facility (GBIF)](https://www.gbif.org/)
+
+-   Fit a simple species distribution model using the random forest machine learning algorithm
+
+-   Visualize the species distribution model results using R

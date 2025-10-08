@@ -3,7 +3,100 @@ title: "Study Area and Environmental Features"
 format: html
 ---
 
-  - NaturalEarthHires (or just read in shp) for Oregon
-  - BeeSpatial walkthrough
-  - `rlandfire` for additional layers
-  - Aggregation and transformation
+## Objectives
+
+- Identify some landscape online data resources that can be used for insect distribution mapping
+
+- Load GIS data layers into R and clean and visualize them in preparation for modeling
+
+## Landscape data resources
+
+We'll be download data using two different resources that serve landscape data to researchers:
+
+- [BeeSpatial](https://beesuite.psu.edu/beespatial/) - A portal to access research data layers and summaries that extends the information presented on the [Beescape app](https://beescape.psu.edu/)
+
+- [`rlandfire`](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) - an R package that provides access to a diverse suite of spatial data layers from [LANDFIRE](https://landfire.gov/), that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.
+
+These resources take two different approaches to serving data, as you'll see.
+
+## BeeSpatial
+
+### Download BeeSpatial data
+
+BeeSpatial has a point-and-click graphical user interface. We will use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step. [More information on using BeeSpatial can be found here.](https://climateecology.github.io/beespatial-tutorial/)
+
+![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
+For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
+
+- Maximum and minimum temperatures for 2015-2023
+- Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023
+- Pollinator nesting resources at 5km range for 2015-2023
+
+### Load the downloaded BeeSpatial data
+
+```{r}
+library(terra)
+
+downloadpath <- "download/Oregon_raster_data/"   # change to your download location
+
+tmin <- rast(paste0(downloadpath,"tmin_2020_STATE_FIPS_41.tif"))
+tmax <- rast(paste0(downloadpath,"tmax_2020_STATE_FIPS_41.tif"))
+
+```
+
+## `rlandfire`
+
+### Download `rlandfire` data
+
+We will use `rlandfire` to get additional landscape data:
+
+- Elevation
+- Vegetation cover
+
+See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
+
+As a first step, load the package and use one of our raster layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the landfire data.
+
+We extend the AOI by 1000m to make sure we're getting the full extent of the data and add context of bordering areas when aggregating the data. We also convert the AOI to the WGS84 coordinate system because that is what LANDfire needs.
+
+```{r}
+#| warning: false
+#| message: false
+
+library(rlandfire)
+
+projection <- "epsg:32610"   # We are using UTM zone 10N (good for Oregon)
+
+aoi <- getAOI(project(tmin, projection), extend = 1000)
+aoi
+
+```
+
+We specify the LANDfire products using their abbreviated names. The layers can be viewed [here](https://lfps.usgs.gov/products), which is also accessible using the package function `rlandfire::viewProducts()`. We will be selecting the layers from 2020 (version 2.2.0).
+
+```{r}
+
+# 200EVH = existing vegetation height
+# ELEV2020 = 2020 elevation
+
+products <- c("200EVH", "ELEV2020")
+
+# additional parameters
+email <- "rlandfire@example.com"
+path <- tempfile(fileext = ".zip")
+projection <- 32610
+
+resp <- landfireAPIv2(products = products,
+                    aoi = aoi, 
+                    projection = projection,
+                    email = email,
+                    path = path,
+                    verbose = FALSE)
+
+```
+
+
+-   NaturalEarthHires (or just read in shp) for Oregon
+-   BeeSpatial walkthrough
+-   `rlandfire` for additional layers
+-   Aggregation and transformation

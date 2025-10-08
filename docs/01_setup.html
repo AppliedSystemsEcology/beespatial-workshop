@@ -224,19 +224,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="renv" class="level2">
 <h2 class="anchored" data-anchor-id="renv"><code>renv</code></h2>
-<p>For this workshop we will use the <code>renv</code> package to create a reproducible R environment. To initialize the environment first install the <code>renv</code> package and then run <code>renv::restore()</code> to install all of the packages we will use in this workshop.</p>
+<p>For this workshop we will use the <code>renv</code> package to create a reproducible R environment. To initialize the environment first install the <code>renv</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"renv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>The following package(s) will be installed:
-- renv [1.1.5]
-These packages will be installed into "~/Documents/GitHub/beespatial-workshop/renv/library/macos/R-4.5/aarch64-apple-darwin20".
-
-# Installing packages --------------------------------------------------------
-- Installing renv ...                           OK [linked from cache]
-Successfully installed 1 package in 4.3 milliseconds.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then run <code>renv::restore()</code> to install all of the packages we will use in this workshop.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>- The library is already synchronized with the lockfile.</code></pre>
 </div>

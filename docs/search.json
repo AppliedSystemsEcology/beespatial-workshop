@@ -24,7 +24,7 @@
     "href": "01_setup.html",
     "title": "Setup your R environment",
     "section": "",
-    "text": "Install packages/setup environment\nWhere to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE\nDownloading/cloning the github repo\n\n\n\nFor this workshop we will use the renv package to create a reproducible R environment. To initialize the environment first install the renv package and then run renv::restore() to install all of the packages we will use in this workshop.\n\ninstall.packages(\"renv\")\n\nThe following package(s) will be installed:\n- renv [1.1.5]\nThese packages will be installed into \"~/Documents/GitHub/beespatial-workshop/renv/library/macos/R-4.5/aarch64-apple-darwin20\".\n\n# Installing packages --------------------------------------------------------\n- Installing renv ...                           OK [linked from cache]\nSuccessfully installed 1 package in 4.3 milliseconds.\n\nrenv::restore()\n\n- The library is already synchronized with the lockfile.",
+    "text": "Install packages/setup environment\nWhere to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE\nDownloading/cloning the github repo\n\n\n\nFor this workshop we will use the renv package to create a reproducible R environment. To initialize the environment first install the renv package.\n\ninstall.packages(\"renv\")\n\nThen run renv::restore() to install all of the packages we will use in this workshop.\n\nrenv::restore()\n\n- The library is already synchronized with the lockfile.",
     "crumbs": [
       "1 Setup"
     ]
@@ -34,7 +34,7 @@
     "href": "01_setup.html#renv",
     "title": "Setup your R environment",
     "section": "",
-    "text": "For this workshop we will use the renv package to create a reproducible R environment. To initialize the environment first install the renv package and then run renv::restore() to install all of the packages we will use in this workshop.\n\ninstall.packages(\"renv\")\n\nThe following package(s) will be installed:\n- renv [1.1.5]\nThese packages will be installed into \"~/Documents/GitHub/beespatial-workshop/renv/library/macos/R-4.5/aarch64-apple-darwin20\".\n\n# Installing packages --------------------------------------------------------\n- Installing renv ...                           OK [linked from cache]\nSuccessfully installed 1 package in 4.3 milliseconds.\n\nrenv::restore()\n\n- The library is already synchronized with the lockfile.",
+    "text": "For this workshop we will use the renv package to create a reproducible R environment. To initialize the environment first install the renv package.\n\ninstall.packages(\"renv\")\n\nThen run renv::restore() to install all of the packages we will use in this workshop.\n\nrenv::restore()\n\n- The library is already synchronized with the lockfile.",
     "crumbs": [
       "1 Setup"
     ]
@@ -44,7 +44,7 @@
     "href": "02_envFeatures.html",
     "title": "Study Area and Environmental Features",
     "section": "",
-    "text": "NaturalEarthHires (or just read in shp) for Oregon\nBeeSpatial walkthrough\nrlandfire for additional layers\nAggregation and transformation",
+    "text": "Identify some landscape online data resources that can be used for insect distribution mapping\nLoad GIS data layers into R and clean and visualize them in preparation for modeling",
     "crumbs": [
       "2 Environmental features"
     ]
@@ -71,9 +71,79 @@
     "href": "03_occurrenceRecords.html#using-rgbif-to-get-occurrence-records",
     "title": "Occurrence Records",
     "section": "Using rgbif to get occurrence records",
-    "text": "Using rgbif to get occurrence records\nThe package rgbif enables you to access GBIF’s API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.\n\nSet up GBIF credentials\nTo download from GBIF, you need to register and supply your registration credentials.\nMore on this here\n\n# install.packages(\"usethis\")\n\nusethis::edit_r_environ()\n\nThis will bring up a file called .Renviron. Add your credential information here (replace with your info).\n\nGBIF_USER=\"fakeuser\"\nGBIF_PWD=\"safe_fake_password_123\"\nGBIF_EMAIL=\"fakeuser@gbif.org\"\n\n\n\nGetting the GBIF taxon key\nAlthough we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function rgbif::name_backbone() to identify the GBIF taxon key that will return precise taxon matches.\n\nrgbif::name_backbone(\"Bombus sitkensis\")\n\n# A tibble: 1 × 22\n  usageKey scientificName        canonicalName rank  status confidence matchType\n*    &lt;int&gt; &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;    \n1  1340328 Bombus sitkensis Nyl… Bombus sitke… SPEC… ACCEP…         97 EXACT    \n# ℹ 15 more variables: kingdom &lt;chr&gt;, phylum &lt;chr&gt;, order &lt;chr&gt;, family &lt;chr&gt;,\n#   genus &lt;chr&gt;, species &lt;chr&gt;, kingdomKey &lt;int&gt;, phylumKey &lt;int&gt;,\n#   classKey &lt;int&gt;, orderKey &lt;int&gt;, familyKey &lt;int&gt;, genusKey &lt;int&gt;,\n#   speciesKey &lt;int&gt;, class &lt;chr&gt;, verbatim_name &lt;chr&gt;\n\n\nThe taxon key for Bombus sitkensis is 1340328.\n\n\nSet up an rgbif query\nThere are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:\n\nHas geographic coordinates\nHas no geospatial issues\nHas acceptable geospatial coordinate accuracy\nRepresents the presence of the target organism\nWithin a desired time range\nRepresents a human observation\nIs within our focal geographic extent\n\nThe GBIF API has specific search terms (called ‘predicates’ in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values\n\nhasCoordinate &lt;- TRUE\nhasGeospatialIssue &lt;- FALSE\ncoordinateUncertaintyInMeters &lt;- \"0,120\"\noccurrenceStatus &lt;- \"PRESENT\"\nyear &lt;- \"2015,2025\"\nbasisOfRecord &lt;- \"OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE\"\nstateProvince &lt;- \"Oregon\"\ncountry &lt;- \"US\"\n\nNow we can use the function rgbif::occ_count() to preview how many GBIF records we will return if we use these search terms.\n\nrgbif::occ_count(\n  taxonKey = 1340328.,\n  hasCoordinate = hasCoordinate,\n  hasGeospatialIssue = hasGeospatialIssue,\n  coordinateUncertaintyInMeters = coordinateUncertaintyInMeters,\n  occurrenceStatus = occurrenceStatus,\n  year = year,\n  basisOfRecord = basisOfRecord,\n  stateProvince = stateProvince,\n  country = country\n)\n\n[1] 204",
+    "text": "Using rgbif to get occurrence records\nThe package rgbif enables you to access GBIF’s API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.\n\nSet up GBIF credentials\nTo download from GBIF, you need to register and supply your registration credentials.\nMore on this here\n\n# install.packages(\"usethis\")\n\nusethis::edit_r_environ()\n\nThis will bring up a file called .Renviron. Add your credential information here (replace with your info).\n\nGBIF_USER=\"fakeuser\"\nGBIF_PWD=\"safe_fake_password_123\"\nGBIF_EMAIL=\"fakeuser@gbif.org\"\n\n\n\nGet the GBIF taxon key\nAlthough we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function rgbif::name_backbone() to identify the GBIF taxon key that will return precise taxon matches.\n\nrgbif::name_backbone(\"Bombus sitkensis\")\n\n# A tibble: 1 × 22\n  usageKey scientificName        canonicalName rank  status confidence matchType\n*    &lt;int&gt; &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;    \n1  1340328 Bombus sitkensis Nyl… Bombus sitke… SPEC… ACCEP…         97 EXACT    \n# ℹ 15 more variables: kingdom &lt;chr&gt;, phylum &lt;chr&gt;, order &lt;chr&gt;, family &lt;chr&gt;,\n#   genus &lt;chr&gt;, species &lt;chr&gt;, kingdomKey &lt;int&gt;, phylumKey &lt;int&gt;,\n#   classKey &lt;int&gt;, orderKey &lt;int&gt;, familyKey &lt;int&gt;, genusKey &lt;int&gt;,\n#   speciesKey &lt;int&gt;, class &lt;chr&gt;, verbatim_name &lt;chr&gt;\n\n\nThe taxon key for Bombus sitkensis is 1340328.\n\n\nSet up an rgbif query\nThere are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:\n\nHas geographic coordinates\nHas no geospatial issues\nHas acceptable geospatial coordinate accuracy\nRepresents the presence of the target organism\nWithin a desired time range\nRepresents a human observation\nIs within our focal geographic extent\n\nThe GBIF API has specific search terms (called ‘predicates’ in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values\n\nhasCoordinate &lt;- TRUE\nhasGeospatialIssue &lt;- FALSE\ncoordinateUncertaintyInMeters &lt;- \"0,120\"\noccurrenceStatus &lt;- \"PRESENT\"\nyear &lt;- \"2015,2025\"\nbasisOfRecord &lt;- \"OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE\"\nstateProvince &lt;- \"Oregon\"\ncountry &lt;- \"US\"\n\nNow we can use the function rgbif::occ_count() to preview how many GBIF records we will return if we use these search terms.\n\nrgbif::occ_count(\n  taxonKey = 1340328.,\n  hasCoordinate = hasCoordinate,\n  hasGeospatialIssue = hasGeospatialIssue,\n  coordinateUncertaintyInMeters = coordinateUncertaintyInMeters,\n  occurrenceStatus = occurrenceStatus,\n  year = year,\n  basisOfRecord = basisOfRecord,\n  stateProvince = stateProvince,\n  country = country\n)\n\n[1] 204",
     "crumbs": [
       "3 Occurrence records"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to the Eco-Spatial Workshop!",
+    "section": "",
+    "text": "This website is the online material for the workshop An Introduction to Eco-spatial Data in R: Accessing, Visualizing, and Applying Machine Learning at Entomology 2025.",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "index.html#objectives",
+    "href": "index.html#objectives",
+    "title": "Welcome to the Eco-Spatial Workshop!",
+    "section": "Objectives",
+    "text": "Objectives\nBy the end of this course, attendees will be able to:\n\nIdentify some landscape online data resources that can be used for insect distribution mapping\nLoad GIS data layers into R and clean and visualize them in preparation for modeling\nUse an R package to search for and download georeferenced citizen science observation records from the Global Biodiversity Information Facility (GBIF)\nFit a simple species distribution model using the random forest machine learning algorithm\nVisualize the species distribution model results using R",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "index.html#workshop-objectives",
+    "href": "index.html#workshop-objectives",
+    "title": "Welcome to the Eco-Spatial Workshop!",
+    "section": "Workshop Objectives",
+    "text": "Workshop Objectives\nBy the end of this course, attendees will be able to:\n\nIdentify some landscape online data resources that can be used for insect distribution mapping\nLoad GIS data layers into R and clean and visualize them in preparation for modeling\nUse an R package to search for and download georeferenced citizen science observation records from the Global Biodiversity Information Facility (GBIF)\nFit a simple species distribution model using the random forest machine learning algorithm\nVisualize the species distribution model results using R",
+    "crumbs": [
+      "Welcome"
+    ]
+  },
+  {
+    "objectID": "02_envFeatures.html#objectives",
+    "href": "02_envFeatures.html#objectives",
+    "title": "Study Area and Environmental Features",
+    "section": "",
+    "text": "Identify some landscape online data resources that can be used for insect distribution mapping\nLoad GIS data layers into R and clean and visualize them in preparation for modeling",
+    "crumbs": [
+      "2 Environmental features"
+    ]
+  },
+  {
+    "objectID": "02_envFeatures.html#landscape-data-resources",
+    "href": "02_envFeatures.html#landscape-data-resources",
+    "title": "Study Area and Environmental Features",
+    "section": "Landscape data resources",
+    "text": "Landscape data resources\nWe’ll be download data using two different resources that serve landscape data to researchers:\n\nBeeSpatial - A portal to access research data layers and summaries that extends the information presented on the Beescape app\nrlandfire - an R package that provides access to a diverse suite of spatial data layers from LANDFIRE, that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.\n\nThese resources take two different approaches to serving data, as you’ll see.",
+    "crumbs": [
+      "2 Environmental features"
+    ]
+  },
+  {
+    "objectID": "02_envFeatures.html#beespatial",
+    "href": "02_envFeatures.html#beespatial",
+    "title": "Study Area and Environmental Features",
+    "section": "BeeSpatial",
+    "text": "BeeSpatial\n\nDownload BeeSpatial data\nBeeSpatial has a point-and-click graphical user interface. We will use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the Select geographic boundaries option in the Select locations step. More information on using BeeSpatial can be found here.\n For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:\n\nMaximum and minimum temperatures for 2015-2023\nPollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023\nPollinator nesting resources at 5km range for 2015-2023\n\n\n\nLoad the downloaded BeeSpatial data\n\nlibrary(terra)\n\nterra 1.8.60\n\ndownloadpath &lt;- \"download/Oregon_raster_data/\"   # change to your download location\n\ntmin &lt;- rast(paste0(downloadpath,\"tmin_2020_STATE_FIPS_41.tif\"))\ntmax &lt;- rast(paste0(downloadpath,\"tmax_2020_STATE_FIPS_41.tif\"))",
+    "crumbs": [
+      "2 Environmental features"
+    ]
+  },
+  {
+    "objectID": "02_envFeatures.html#rlandfire",
+    "href": "02_envFeatures.html#rlandfire",
+    "title": "Study Area and Environmental Features",
+    "section": "rlandfire",
+    "text": "rlandfire\n\nDownload rlandfire data\nWe will use rlandfire to get additional landscape data:\n\nElevation\nVegetation cover\n\nSee the rlandfire tutorial for more background about these steps.\nAs a first step, load the package and use one of our raster layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the landfire data.\n\nlibrary(rlandfire)\n\n\nNaturalEarthHires (or just read in shp) for Oregon\nBeeSpatial walkthrough\nrlandfire for additional layers\nAggregation and transformation",
+    "crumbs": [
+      "2 Environmental features"
     ]
   }
 ]
