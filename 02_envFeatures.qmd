@@ -5,17 +5,17 @@ format: html
 
 ## Objectives
 
-- Identify some landscape online data resources that can be used for insect distribution mapping
+-   Identify some landscape online data resources that can be used for insect distribution mapping
 
-- Load GIS data layers into R and clean and visualize them in preparation for modeling
+-   Load GIS data layers into R and clean and visualize them in preparation for modeling
 
 ## Landscape data resources
 
 We'll be download data using two different resources that serve landscape data to researchers:
 
-- [BeeSpatial](https://beesuite.psu.edu/beespatial/) - A portal to access research data layers and summaries that extends the information presented on the [Beescape app](https://beescape.psu.edu/)
+-   [BeeSpatial](https://beesuite.psu.edu/beespatial/) - A portal to access research data layers and summaries that extends the information presented on the [Beescape app](https://beescape.psu.edu/)
 
-- [`rlandfire`](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) - an R package that provides access to a diverse suite of spatial data layers from [LANDFIRE](https://landfire.gov/), that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.
+-   [`rlandfire`](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) - an R package that provides access to a diverse suite of spatial data layers from [LANDFIRE](https://landfire.gov/), that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.
 
 These resources take two different approaches to serving data, as you'll see.
 
@@ -25,12 +25,11 @@ These resources take two different approaches to serving data, as you'll see.
 
 BeeSpatial has a point-and-click graphical user interface. We will use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step. [More information on using BeeSpatial can be found here.](https://climateecology.github.io/beespatial-tutorial/)
 
-![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
-For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
+![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg) For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
 
-- Maximum and minimum temperatures for 2015-2023
-- Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023
-- Pollinator nesting resources at 5km range for 2015-2023
+-   Maximum and minimum temperatures for 2015-2023
+-   ~~*Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023*~~
+-   ~~*Pollinator nesting resources at 5km range for 2015-2023*~~
 
 ### Load the downloaded BeeSpatial data
 
@@ -50,8 +49,8 @@ tmax <- rast(paste0(downloadpath,"tmax_2020_STATE_FIPS_41.tif"))
 
 We will use `rlandfire` to get additional landscape data:
 
-- Elevation
-- Vegetation cover
+-   Elevation
+-   Vegetation cover
 
 See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
 
@@ -83,18 +82,18 @@ products <- c("200EVH", "ELEV2020")
 
 # additional parameters
 email <- "rlandfire@example.com"
-path <- tempfile(fileext = ".zip")
+lfpath <- paste0(getwd(),"/download/lf.zip")   # change to your download path
+# lfpath <-"/download/lf.zip"   # change to your download path
 projection <- 32610
 
 resp <- landfireAPIv2(products = products,
                     aoi = aoi, 
                     projection = projection,
                     email = email,
-                    path = path,
+                    path = lfpath,
                     verbose = FALSE)
 
 ```
-
 
 -   NaturalEarthHires (or just read in shp) for Oregon
 -   BeeSpatial walkthrough
