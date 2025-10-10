@@ -213,6 +213,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#resample" id="toc-resample" class="nav-link" data-scroll-target="#resample">Resample</a></li>
   </ul></li>
   </ul></li>
+  <li><a href="#pollinator-habitat-quality-layers" id="toc-pollinator-habitat-quality-layers" class="nav-link" data-scroll-target="#pollinator-habitat-quality-layers">Pollinator habitat quality layers</a></li>
   </ul>
 </nav>
     </div>
@@ -347,7 +348,7 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 <li><code>200EVH</code> = existing vegetation height (not used)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>products <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ELEV2020"</span>)</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>products <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ELEV2020"</span>, <span class="st">"200CC_20"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># additional parameters</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>email <span class="ot">&lt;-</span> <span class="st">"rlandfire@example.com"</span></span>
@@ -366,16 +367,16 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 </section>
 <section id="load-the-downloaded-data-1" class="level3">
 <h3 class="anchored" data-anchor-id="load-the-downloaded-data-1">Load the downloaded data</h3>
-<p>In order to load the layer into R, unzip the file at the location you indicated in <code>lfpath</code>. We want the file with the extension ‘.tif’. The filename produced is long, so we’ve renamed it to ‘elevation.tif’ in these directions.</p>
+<p>In order to load the layers into R, unzip the file at the location you indicated in <code>lfpath</code>. We want the file with the extension ‘.tif’. The filename is long and uninformative, so we’ve already renamed it to ‘elevcc.tif’ for these directions. From plotting, we see that the two layers we requested are stacked in a single raster.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>elev <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath, <span class="st">"elevation.tif"</span>))</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>elevcc <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath, <span class="st">"elevcc.tif"</span>))</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(elev)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(elevcc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="02_envFeatures_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Elevation data from LANDFIRE.</figcaption>
+<figcaption>Elevation and canopy cover data from LANDFIRE.</figcaption>
 </figure>
 </div>
 </div>
@@ -460,9 +461,9 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 <section id="make-model-input-layers-align" class="level2">
 <h2 class="anchored" data-anchor-id="make-model-input-layers-align">Make model input layers align</h2>
 <p>To overlay these raster day from different sources, we need to check if they have the same <strong>projection</strong>, <strong>resolution</strong>, and <strong>alignment</strong>.</p>
-<p>Check if the climate data and LANDFIRE data have the same projection. We’re only using <code>prmean</code> for the climate data, since we know they’re all from the same source.</p>
+<p>Check if the climate data and LANDFIRE data have the same projection. We’re only checking <code>prmean</code> and <code>elev</code>, but you can use the same code to check the other layers.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(<span class="fu">crs</span>(prmean), <span class="fu">crs</span>(elev))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(<span class="fu">crs</span>(prmean), <span class="fu">crs</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -470,7 +471,7 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 <p>We expected the projection to be the same because we requested a specific projection in <code>rlandfire</code>.</p>
 <p>Check if the resolution is the same.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elev))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Mean relative difference: 6.449424e-05"</code></pre>
 </div>
@@ -478,31 +479,62 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 <p>It looks like there’s a small difference resolution. If you compare the actual values of the climate data (<code>res(prmean)</code>) and elevation (<code>res(elev)</code>), it looks like the LANDFIRE layer only matches the climate layer resolution to the nearest whole number. This means that these layers also don’t align over their extents.</p>
 <section id="resample" class="level3">
 <h3 class="anchored" data-anchor-id="resample">Resample</h3>
-<p>To make these layers’ resolution match and their pixels align, we will use resampling. This means transferring the raster data to a new pixel grid. We will do this by matching the <code>elev</code> raster grid to that of the climate datasets. To translate the data to the new grid, we will use the <strong>nearest neighbor function</strong>, which simply assigns pixel values to the new grid based on the value of the nearest pixel value from the old grid. There are other options that use continuous interpolation but we’re keeping it simple for this workshop.</p>
+<p>To make these layers’ resolution match and their pixels align, we will use <strong>resampling</strong>. This means transferring the raster data to a new pixel grid. We will do this by matching the <code>elev</code> and <code>cc</code> rasters to that of the climate datasets. To translate the data to the new grid, we will use the <strong>bilinear interpolation</strong>, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>elev2 <span class="ot">&lt;-</span> <span class="fu">resample</span>(elev,            <span class="co"># layer to be resampled</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                  prmean,          <span class="co"># target grid to base resampling on</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"near"</span>  <span class="co"># method is nearest neighbor</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>elevcc2 <span class="ot">&lt;-</span> <span class="fu">resample</span>(elevcc,              <span class="co"># layer to be resampled</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                    prmean,              <span class="co"># target grid to base resampling on</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">"bilinear"</span>  <span class="co"># method is bilinear interpolation</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we can check if these layers share the same resolution:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elev2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
 <p>And if their extents are the same:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">ext</span>(prmean), <span class="fu">ext</span>(elev2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">ext</span>(prmean), <span class="fu">ext</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
-
-
 </section>
 </section>
+</section>
+<section id="pollinator-habitat-quality-layers" class="level1">
+<h1>Pollinator habitat quality layers</h1>
+<p>We can get some additional habitat quality layers from BeeSpatial:</p>
+<ul>
+<li>Seasonal pollinator forage (spring, summer, and fall)</li>
+<li>Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)</li>
+<li>Potential insecticide use based on typical practices in the state (in 2014)</li>
+</ul>
+<p>These indices have been summarized to represent the weighted average value within 5km, using an exponential decay function as you go further from a given location (the pixel center). For more information on the forage nesting data, see <a href="https://doi.org/10.1073/pnas.1517685113">Koh et al.&nbsp;(2015)</a> and for insecticide use, see <a href="https://doi.org/10.1038/s41597-022-01584-z">Douglas et al.&nbsp;(2022)</a>.</p>
+<p>Since these layers are 30m resolution, downloading them for the entire state of Oregon isn’t practical for the workshop. Instead we’ve already processed them using the same projection and resampling steps as above to match the climate data layers.</p>
+<p>However, in case you’re interested, the code to do this is here:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extra info: Processing 30m pollinator habitat quality layers to match climate layers</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load 30m layers</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>expath <span class="ot">&lt;-</span> <span class="st">"download/extra/"</span>      <span class="co"># location of 30m layers</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>forageFall30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_fall_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>forageSpring30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_spring_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>forageSummer30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_summer_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>nesting30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Nesting_2020_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>insecticide30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Insecticide_2020_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Re-project -- projecting the data actually also resamples it. The default method is `bilinear`</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>forageFall <span class="ot">&lt;-</span> <span class="fu">project</span>(forageFall30m, prmean)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>forageSpring <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSpring30m, prmean)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>forageSummer <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSummer30m, prmean)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>nesting <span class="ot">&lt;-</span> <span class="fu">project</span>(nesting30m, prmean)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>insecticide <span class="ot">&lt;-</span> <span class="fu">project</span>(insecticide30m, prmean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->

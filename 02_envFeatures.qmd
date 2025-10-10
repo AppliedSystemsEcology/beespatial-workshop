@@ -105,7 +105,7 @@ To request layers using `rlandfire` we have to specify the LANDFIRE products usi
 ```{r}
 #| eval: false
 
-products <- c("ELEV2020")
+products <- c("ELEV2020", "200CC_20")
 
 # additional parameters
 email <- "rlandfire@example.com"
@@ -125,14 +125,14 @@ resp <- landfireAPIv2(products = products,
 
 ### Load the downloaded data
 
-In order to load the layer into R, unzip the file at the location you indicated in `lfpath`. We want the file with the extension '.tif'. The filename produced is long, so we've renamed it to 'elevation.tif' in these directions.
+In order to load the layers into R, unzip the file at the location you indicated in `lfpath`. We want the file with the extension '.tif'. The filename is long and uninformative, so we've already renamed it to 'elevcc.tif' for these directions. From plotting, we see that the two layers we requested are stacked in a single raster.
 
 ```{r}
-#| fig-cap: Elevation data from LANDFIRE.
+#| fig-cap: Elevation and canopy cover data from LANDFIRE.
 
-elev <- rast(paste0(downloadpath, "elevation.tif"))
+elevcc <- rast(paste0(downloadpath, "elevcc.tif"))
 
-plot(elev)
+plot(elevcc)
 
 ```
 
@@ -204,11 +204,11 @@ prmean <- mean(pr)
 
 To overlay these raster day from different sources, we need to check if they have the same **projection**, **resolution**, and **alignment**.
 
-Check if the climate data and LANDFIRE data have the same projection. We're only using `prmean` for the climate data, since we know they're all from the same source.
+Check if the climate data and LANDFIRE data have the same projection. We're only checking `prmean` and `elev`, but you can use the same code to check the other layers.
 
 ```{r}
 
-same.crs(crs(prmean), crs(elev))
+same.crs(crs(prmean), crs(elevcc))
 
 ```
 
@@ -218,7 +218,7 @@ Check if the resolution is the same.
 
 ```{r}
 
-all.equal(res(prmean), res(elev))
+all.equal(res(prmean), res(elevcc))
 
 ```
 
@@ -226,14 +226,14 @@ It looks like there's a small difference resolution. If you compare the actual v
 
 ### Resample
 
-To make these layers' resolution match and their pixels align, we will use resampling. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` raster grid to that of the climate datasets. To translate the data to the new grid, we will use the **nearest neighbor function**, which simply assigns pixel values to the new grid based on the value of the nearest pixel value from the old grid. There are other options that use continuous interpolation but we're keeping it simple for this workshop.
+To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use the **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.
 
 ```{r}
 
-elev2 <- resample(elev,            # layer to be resampled
-                  prmean,          # target grid to base resampling on
-                  method = "near"  # method is nearest neighbor
-                  )
+elevcc2 <- resample(elevcc,              # layer to be resampled
+                    prmean,              # target grid to base resampling on
+                    method = "bilinear"  # method is bilinear interpolation
+                    )
 
 ```
 
@@ -241,7 +241,7 @@ Now we can check if these layers share the same resolution:
 
 ```{r}
 
-all.equal(res(prmean), res(elev2))
+all.equal(res(prmean), res(elevcc2))
 
 ```
 
@@ -249,6 +249,65 @@ And if their extents are the same:
 
 ```{r}
 
-all.equal(ext(prmean), ext(elev2))
+all.equal(ext(prmean), ext(elevcc2))
+
+```
+
+```{r}
+#| echo: false
+#| eval: false
+
+writeRaster(prmean, "data/prmean.tif")
+writeRaster(tmean_yr, "data/tmean_yr.tif")
+writeRaster(elevcc2, "data/elevcc.tif")
+
+```
+
+# Pollinator habitat quality layers
+
+We can get some additional habitat quality layers from BeeSpatial:
+
+- Seasonal pollinator forage (spring, summer, and fall)
+- Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)
+- Potential insecticide use based on typical practices in the state (in 2014)
+
+These indices have been summarized to represent the weighted average value within 5km, using an exponential decay function as you go further from a given location (the pixel center). For more information on the forage nesting data, see [Koh et al. (2015)](https://doi.org/10.1073/pnas.1517685113) and for insecticide use, see [Douglas et al. (2022)](https://doi.org/10.1038/s41597-022-01584-z).
+
+Since these layers are 30m resolution, downloading them for the entire state of Oregon isn't practical for the workshop. Instead we've already processed them using the same projection and resampling steps as above to match the climate data layers.
+
+However, in case you're interested, the code to do this is here:
+
+```{r extra_30m}
+#| eval: false
+
+# Extra info: Processing 30m pollinator habitat quality layers to match climate layers
+
+# 1. Load 30m layers
+expath <- "download/extra/"      # location of 30m layers
+
+forageFall30m <- rast(paste0(expath, "Forage_2020_fall_5km_STATE_FIPS_41.tif"))
+forageSpring30m <- rast(paste0(expath, "Forage_2020_spring_5km_STATE_FIPS_41.tif"))
+forageSummer30m <- rast(paste0(expath, "Forage_2020_summer_5km_STATE_FIPS_41.tif"))
+nesting30m <- rast(paste0(expath, "Nesting_2020_5km_STATE_FIPS_41.tif"))
+insecticide30m <- rast(paste0(expath, "Insecticide_2020_5km_STATE_FIPS_41.tif"))
+
+# 2. Re-project -- projecting the data actually also resamples it. The default method is `bilinear`
+forageFall <- project(forageFall30m, prmean)
+forageSpring <- project(forageSpring30m, prmean)
+forageSummer <- project(forageSummer30m, prmean)
+nesting <- project(nesting30m, prmean)
+insecticide <- project(insecticide30m, prmean)
+
+```
+
+```{r}
+#| echo: false
+#| eval: false
+
+writeRaster(forageFall, "data/forageFall.tif")
+writeRaster(forageSpring, "data/forageSpring.tif")
+writeRaster(forageSummer, "data/forageSummer.tif")
+writeRaster(nesting, "data/nesting.tif")
+writeRaster(insecticide, "data/insecticide.tif")
 
 ```
