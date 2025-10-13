@@ -3,29 +3,33 @@ title: "Occurrence Records"
 format: html
 ---
 
-  - `rgbif` to download records
-  -  Simple filtering/removing duplicates
-  -  Extract features at each point
-  
-## Using `rgbif` to get occurrence records
+# Use `rgbif` to get occurrence records
 
 The package `rgbif` enables you to access GBIF's API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.
+
+Load the package
+
+```{r}
+#| message: false
+
+library(rgbif)
+
+```
   
-### Set up GBIF credentials
+## Set up GBIF credentials
 
-To download from GBIF, you need to register and supply your registration credentials.
+To download from GBIF, you need to register and supply your registration credentials. More on this [here](https://docs.ropensci.org/rgbif/articles/gbif_credentials.html). Or you can use the account info that we've provided for this workshop.
 
-More on this [here](https://docs.ropensci.org/rgbif/articles/gbif_credentials.html)
+Once you have your credentials ready, you need to add them to your R environment. The package `usethis` has a handy function that brings up the file you need to edit to do this:
 
 ```{r}
 #| eval: false
-# install.packages("usethis")
 
 usethis::edit_r_environ()
 
 ```
 
-This will bring up a file called **.Renviron**. Add your credential information here (replace with your info).
+This will bring up a file called **.Renviron**. Add your own credential information here (replace the info in quotes with your info), or you can use the account info that we've provided for this workshop.
 
 ```{r}
 #| eval: false
@@ -37,19 +41,20 @@ GBIF_EMAIL="fakeuser@gbif.org"
 ```
 
 
-### Get the GBIF taxon key
+## Get the GBIF taxon key
 
 Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function `rgbif::name_backbone()` to identify the GBIF taxon key that will return precise taxon matches.
 
 ```{r taxonkey}
+#| message: false
 
-rgbif::name_backbone("Bombus sitkensis")
+name_backbone("Bombus sitkensis")
 
 ```
 
-The taxon key for _Bombus sitkensis_ is 1340328.
+The taxon key for _Bombus sitkensis_ is **1340328**.
 
-### Set up an `rgbif` query
+## Set up an `rgbif` query
 
 There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:
 
@@ -80,8 +85,8 @@ Now we can use the function `rgbif::occ_count()` to preview how many GBIF record
 
 ```{r counts}
 
-rgbif::occ_count(
-  taxonKey = 1340328.,
+occ_count(
+  taxonKey = 1340328,
   hasCoordinate = hasCoordinate,
   hasGeospatialIssue = hasGeospatialIssue,
   coordinateUncertaintyInMeters = coordinateUncertaintyInMeters,
@@ -91,5 +96,197 @@ rgbif::occ_count(
   stateProvince = stateProvince,
   country = country
 )
+
+```
+
+## Make the GBIF request
+
+Now that we know everything works, we make an actual request. We can use the function `occ_download()` to actually get the data. This function also returns a doi for reproducibility!
+
+```{r}
+#| eval: false
+
+gbif_download <- occ_download(
+  pred("taxonKey", 1340328),
+  pred("hasCoordinate", hasCoordinate),
+  pred("hasGeospatialIssue", hasGeospatialIssue),
+  pred_lte("coordinateUncertaintyInMeters",120),
+  pred_gte("coordinateUncertaintyInMeters",0),
+  pred("occurrenceStatus", occurrenceStatus),
+  pred_gte("year", 2015),
+  pred_lte("year", 2025),
+  pred_in("basisOfRecord",c("OBSERVATION","HUMAN_OBSERVATION","OCCURRENCE")),
+  pred("country", country),
+  pred("stateProvince",stateProvince)
+)
+
+```
+
+We can check on the status of the download using `occ_download_wait` and the code provided in the output from running `occ_download`
+
+```{r}
+#| eval: false
+
+occ_download_wait(gbif_download)
+
+```
+
+##### Example output:
+
+```
+<<gbif download metadata>>
+  Status: SUCCEEDED
+  DOI: 10.15468/dl.jkj7fd
+  Format: DWCA
+  Download key: 0015030-251009101135966
+  Created: 2025-10-13T19:21:28.361+00:00
+  Modified: 2025-10-13T19:26:19.243+00:00
+  Download link: https://api.gbif.org/v1/occurrence/download/request/0015030-251009101135966.zip
+  Total records: 204
+```
+
+Finally, once the download is ready, we can get the data:
+
+```{r}
+#| eval: false
+
+occ <- occ_download_get(gbif_download) |> occ_download_import()
+
+```
+
+```{r}
+#| echo: false
+occ <- readRDS("data/occ.rds")
+```
+
+# Process occurence data
+
+## Load environmental and habitat rasters
+
+The following steps require the library `terra` and the environmental and habitat layers from the last section. Load these if you don't have them in your environment already.
+
+```{r}
+#| message: false
+
+library(terra)
+
+prmean <- rast("data/prmean.tif")
+tmean_yr <- rast("data/tmean_yr.tif")
+elevcc <- rast("data/elevcc.tif")
+forageFall <- rast("data/forageFall.tif")
+forageSpring <- rast("data/forageSpring.tif")
+forageSummer <- rast("data/forageSummer.tif")
+nesting <- rast("data/nesting.tif")
+insecticide <- rast("data/insecticide.tif")
+
+```
+
+### Rename rasters
+
+When making these rasters, the `terra` package automatically generates names that aren't always legible. Here we use the `names() <-` function to rename the layers to something more understandable.
+
+```{r}
+
+# rename layers for reference
+
+names(prmean) <- "prmean"
+names(tmean_yr) <- "tmean"
+names(elevcc) <- c("elev", "canopycov")
+names(forageSpring) <- "forageSpring"
+names(forageSummer) <- "forageSummer"
+names(forageFall) <- "forageFall"
+names(nesting) <- "nesting"
+names(insecticide) <- "insecticide"
+
+```
+
+## Create occurence grid for _Bombus sitkensis_
+
+We use the coordinates of the GBIF observations to convert into georeferenced points using the `vect` function in `terra`. 
+
+```{r}
+
+occ.vect <- vect(occ[,c("decimalLongitude","decimalLatitude")], 
+                 geom = c("decimalLongitude","decimalLatitude"), # x and y columns
+                 crs = "epsg:4326")  # WGS 1984 geographic coordinate system
+
+plot(occ.vect)
+
+```
+
+### Convert the observed points to grid cells
+
+Using one of the environmental grids as a template, we convert the observation points from GBIF to a presence grid, where a grid cell value of `1` indicates that (any number of) observations were reported in that cell.
+
+```{r}
+
+occ.rast <- rasterize(occ.vect |> 
+                        project(prmean),   # project points to match projection
+                      prmean               # template raster
+                      )
+
+# rename the raster layers for reference
+
+names(occ.rast) <- "B_sitkensis"
+
+plot(occ.rast)
+
+```
+
+### Combine presence grid with environment and habitat variables and extract to table
+
+We only need a table of presence grid cells and their associated habitat and environmental values. To do this, we can stack all the raster layers together (since they share the same projection and their grids are aligned). Then we can use the `terra` `values` function to extract the cell values of the stacked grids as rows in a table, keeping only the rows with _B. sitkensis_ presences using the `filter` function from `dplyr`.
+
+```{r}
+#| message: false
+
+library(dplyr)
+
+# stack then environmental and habitat layers and the rasterized occurence points
+
+occ.envr <- rast(list(prmean, tmean_yr, elevcc, forageFall,
+                      forageSpring, forageSummer, nesting, insecticide, occ.rast))
+
+
+presence <- values(occ.envr, dataframe = TRUE, na.rm = TRUE) |> filter(B_sitkensis == 1)
+
+```
+
+## Create background points grid
+
+Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space in the region. This means that background points:
+
+- should be numerous enough to represent the region
+- may overlap with the presence points
+
+The package `predicts` has a function that is useful for creating background points, `backgroundSample`.
+
+```{r}
+library(predicts)
+
+set.seed(100)   # background sampling is random. Setting seed to 100 ensures we get the same results
+
+backgroundpts <- backgroundSample(
+  mask = forageFall,          # mask restricts points to area of interest (defined by the forageFall)
+  n = 10000,                   # create 10000 background points
+)
+
+background <- extract(occ.envr[[1:9]],    # only extracting the environmental/habitat layers
+                      backgroundpts       # extraction locations
+                      )
+
+# combine presence and background data
+
+presback <- bind_rows(presence, background) |>
+  mutate(B_sitkensis = ifelse(is.na(B_sitkensis), 0, B_sitkensis))   # replace NA (from background data) with 0
+
+```
+
+Save the output!
+
+```{r}
+#| eval: false
+
+saveRDS(presback, "data/presback.rds")
 
 ```

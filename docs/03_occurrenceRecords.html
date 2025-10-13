@@ -186,11 +186,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#using-rgbif-to-get-occurrence-records" id="toc-using-rgbif-to-get-occurrence-records" class="nav-link active" data-scroll-target="#using-rgbif-to-get-occurrence-records">Using <code>rgbif</code> to get occurrence records</a>
+  <li><a href="#use-rgbif-to-get-occurrence-records" id="toc-use-rgbif-to-get-occurrence-records" class="nav-link active" data-scroll-target="#use-rgbif-to-get-occurrence-records">Use <code>rgbif</code> to get occurrence records</a>
   <ul class="collapse">
   <li><a href="#set-up-gbif-credentials" id="toc-set-up-gbif-credentials" class="nav-link" data-scroll-target="#set-up-gbif-credentials">Set up GBIF credentials</a></li>
   <li><a href="#get-the-gbif-taxon-key" id="toc-get-the-gbif-taxon-key" class="nav-link" data-scroll-target="#get-the-gbif-taxon-key">Get the GBIF taxon key</a></li>
   <li><a href="#set-up-an-rgbif-query" id="toc-set-up-an-rgbif-query" class="nav-link" data-scroll-target="#set-up-an-rgbif-query">Set up an <code>rgbif</code> query</a></li>
+  <li><a href="#make-the-gbif-request" id="toc-make-the-gbif-request" class="nav-link" data-scroll-target="#make-the-gbif-request">Make the GBIF request</a></li>
+  </ul></li>
+  <li><a href="#process-occurence-data" id="toc-process-occurence-data" class="nav-link" data-scroll-target="#process-occurence-data">Process occurence data</a>
+  <ul class="collapse">
+  <li><a href="#load-environmental-and-habitat-rasters" id="toc-load-environmental-and-habitat-rasters" class="nav-link" data-scroll-target="#load-environmental-and-habitat-rasters">Load environmental and habitat rasters</a>
+  <ul class="collapse">
+  <li><a href="#rename-rasters" id="toc-rename-rasters" class="nav-link" data-scroll-target="#rename-rasters">Rename rasters</a></li>
+  </ul></li>
+  <li><a href="#create-occurence-grid-for-bombus-sitkensis" id="toc-create-occurence-grid-for-bombus-sitkensis" class="nav-link" data-scroll-target="#create-occurence-grid-for-bombus-sitkensis">Create occurence grid for <em>Bombus sitkensis</em></a>
+  <ul class="collapse">
+  <li><a href="#convert-the-observed-points-to-grid-cells" id="toc-convert-the-observed-points-to-grid-cells" class="nav-link" data-scroll-target="#convert-the-observed-points-to-grid-cells">Convert the observed points to grid cells</a></li>
+  <li><a href="#combine-presence-grid-with-environment-and-habitat-variables-and-extract-to-table" id="toc-combine-presence-grid-with-environment-and-habitat-variables-and-extract-to-table" class="nav-link" data-scroll-target="#combine-presence-grid-with-environment-and-habitat-variables-and-extract-to-table">Combine presence grid with environment and habitat variables and extract to table</a></li>
+  </ul></li>
+  <li><a href="#create-background-points-grid" id="toc-create-background-points-grid" class="nav-link" data-scroll-target="#create-background-points-grid">Create background points grid</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -217,35 +231,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<ul>
-<li><code>rgbif</code> to download records</li>
-<li>Simple filtering/removing duplicates</li>
-<li>Extract features at each point</li>
-</ul>
-<section id="using-rgbif-to-get-occurrence-records" class="level2">
-<h2 class="anchored" data-anchor-id="using-rgbif-to-get-occurrence-records">Using <code>rgbif</code> to get occurrence records</h2>
+<section id="use-rgbif-to-get-occurrence-records" class="level1">
+<h1>Use <code>rgbif</code> to get occurrence records</h1>
 <p>The package <code>rgbif</code> enables you to access GBIF’s API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.</p>
-<section id="set-up-gbif-credentials" class="level3">
-<h3 class="anchored" data-anchor-id="set-up-gbif-credentials">Set up GBIF credentials</h3>
-<p>To download from GBIF, you need to register and supply your registration credentials.</p>
-<p>More on this <a href="https://docs.ropensci.org/rgbif/articles/gbif_credentials.html">here</a></p>
+<p>Load the package</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("usethis")</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">edit_r_environ</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgbif)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>This will bring up a file called <strong>.Renviron</strong>. Add your credential information here (replace with your info).</p>
+<section id="set-up-gbif-credentials" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-gbif-credentials">Set up GBIF credentials</h2>
+<p>To download from GBIF, you need to register and supply your registration credentials. More on this <a href="https://docs.ropensci.org/rgbif/articles/gbif_credentials.html">here</a>. Or you can use the account info that we’ve provided for this workshop.</p>
+<p>Once you have your credentials ready, you need to add them to your R environment. The package <code>usethis</code> has a handy function that brings up the file you need to edit to do this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>GBIF_USER<span class="ot">=</span><span class="st">"fakeuser"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>GBIF_PWD<span class="ot">=</span><span class="st">"safe_fake_password_123"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>GBIF_EMAIL<span class="ot">=</span><span class="st">"fakeuser@gbif.org"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">edit_r_environ</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This will bring up a file called <strong>.Renviron</strong>. Add your own credential information here (replace the info in quotes with your info), or you can use the account info that we’ve provided for this workshop.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>GBIF_USER<span class="ot">=</span><span class="st">"fakeuser"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>GBIF_PWD<span class="ot">=</span><span class="st">"safe_fake_password_123"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>GBIF_EMAIL<span class="ot">=</span><span class="st">"fakeuser@gbif.org"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="get-the-gbif-taxon-key" class="level3">
-<h3 class="anchored" data-anchor-id="get-the-gbif-taxon-key">Get the GBIF taxon key</h3>
+<section id="get-the-gbif-taxon-key" class="level2">
+<h2 class="anchored" data-anchor-id="get-the-gbif-taxon-key">Get the GBIF taxon key</h2>
 <p>Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function <code>rgbif::name_backbone()</code> to identify the GBIF taxon key that will return precise taxon matches.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rgbif<span class="sc">::</span><span class="fu">name_backbone</span>(<span class="st">"Bombus sitkensis"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name_backbone</span>(<span class="st">"Bombus sitkensis"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 22
   usageKey scientificName        canonicalName rank  status confidence matchType
@@ -257,10 +268,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 #   speciesKey &lt;int&gt;, class &lt;chr&gt;, verbatim_name &lt;chr&gt;</code></pre>
 </div>
 </div>
-<p>The taxon key for <em>Bombus sitkensis</em> is 1340328.</p>
+<p>The taxon key for <em>Bombus sitkensis</em> is <strong>1340328</strong>.</p>
 </section>
-<section id="set-up-an-rgbif-query" class="level3">
-<h3 class="anchored" data-anchor-id="set-up-an-rgbif-query">Set up an <code>rgbif</code> query</h3>
+<section id="set-up-an-rgbif-query" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-an-rgbif-query">Set up an <code>rgbif</code> query</h2>
 <p>There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:</p>
 <ul>
 <li>Has geographic coordinates</li>
@@ -273,31 +284,193 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>The GBIF API has specific search terms (called ‘predicates’ in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hasCoordinate <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hasGeospatialIssue <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>coordinateUncertaintyInMeters <span class="ot">&lt;-</span> <span class="st">"0,120"</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>occurrenceStatus <span class="ot">&lt;-</span> <span class="st">"PRESENT"</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="st">"2015,2025"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>basisOfRecord <span class="ot">&lt;-</span> <span class="st">"OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE"</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>stateProvince <span class="ot">&lt;-</span> <span class="st">"Oregon"</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>country <span class="ot">&lt;-</span> <span class="st">"US"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>hasCoordinate <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>hasGeospatialIssue <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>coordinateUncertaintyInMeters <span class="ot">&lt;-</span> <span class="st">"0,120"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>occurrenceStatus <span class="ot">&lt;-</span> <span class="st">"PRESENT"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="st">"2015,2025"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>basisOfRecord <span class="ot">&lt;-</span> <span class="st">"OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>stateProvince <span class="ot">&lt;-</span> <span class="st">"Oregon"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>country <span class="ot">&lt;-</span> <span class="st">"US"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we can use the function <code>rgbif::occ_count()</code> to preview how many GBIF records we will return if we use these search terms.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rgbif<span class="sc">::</span><span class="fu">occ_count</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">taxonKey =</span> <span class="fl">1340328.</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasCoordinate =</span> hasCoordinate,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasGeospatialIssue =</span> hasGeospatialIssue,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coordinateUncertaintyInMeters =</span> coordinateUncertaintyInMeters,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">occurrenceStatus =</span> occurrenceStatus,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> year,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">basisOfRecord =</span> basisOfRecord,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateProvince =</span> stateProvince,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> country</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">occ_count</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">taxonKey =</span> <span class="dv">1340328</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasCoordinate =</span> hasCoordinate,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasGeospatialIssue =</span> hasGeospatialIssue,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coordinateUncertaintyInMeters =</span> coordinateUncertaintyInMeters,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">occurrenceStatus =</span> occurrenceStatus,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> year,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">basisOfRecord =</span> basisOfRecord,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateProvince =</span> stateProvince,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> country</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 204</code></pre>
 </div>
+</div>
+</section>
+<section id="make-the-gbif-request" class="level2">
+<h2 class="anchored" data-anchor-id="make-the-gbif-request">Make the GBIF request</h2>
+<p>Now that we know everything works, we make an actual request. We can use the function <code>occ_download()</code> to actually get the data. This function also returns a doi for reproducibility!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>gbif_download <span class="ot">&lt;-</span> <span class="fu">occ_download</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"taxonKey"</span>, <span class="dv">1340328</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"hasCoordinate"</span>, hasCoordinate),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"hasGeospatialIssue"</span>, hasGeospatialIssue),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred_lte</span>(<span class="st">"coordinateUncertaintyInMeters"</span>,<span class="dv">120</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred_gte</span>(<span class="st">"coordinateUncertaintyInMeters"</span>,<span class="dv">0</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"occurrenceStatus"</span>, occurrenceStatus),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred_gte</span>(<span class="st">"year"</span>, <span class="dv">2015</span>),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred_lte</span>(<span class="st">"year"</span>, <span class="dv">2025</span>),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred_in</span>(<span class="st">"basisOfRecord"</span>,<span class="fu">c</span>(<span class="st">"OBSERVATION"</span>,<span class="st">"HUMAN_OBSERVATION"</span>,<span class="st">"OCCURRENCE"</span>)),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"country"</span>, country),</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pred</span>(<span class="st">"stateProvince"</span>,stateProvince)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can check on the status of the download using <code>occ_download_wait</code> and the code provided in the output from running <code>occ_download</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">occ_download_wait</span>(gbif_download)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="example-output" class="level5">
+<h5 class="anchored" data-anchor-id="example-output">Example output:</h5>
+<pre><code>&lt;&lt;gbif download metadata&gt;&gt;
+  Status: SUCCEEDED
+  DOI: 10.15468/dl.jkj7fd
+  Format: DWCA
+  Download key: 0015030-251009101135966
+  Created: 2025-10-13T19:21:28.361+00:00
+  Modified: 2025-10-13T19:26:19.243+00:00
+  Download link: https://api.gbif.org/v1/occurrence/download/request/0015030-251009101135966.zip
+  Total records: 204</code></pre>
+<p>Finally, once the download is ready, we can get the data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>occ <span class="ot">&lt;-</span> <span class="fu">occ_download_get</span>(gbif_download) <span class="sc">|&gt;</span> <span class="fu">occ_download_import</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="process-occurence-data" class="level1">
+<h1>Process occurence data</h1>
+<section id="load-environmental-and-habitat-rasters" class="level2">
+<h2 class="anchored" data-anchor-id="load-environmental-and-habitat-rasters">Load environmental and habitat rasters</h2>
+<p>The following steps require the library <code>terra</code> and the environmental and habitat layers from the last section. Load these if you don’t have them in your environment already.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>prmean <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/prmean.tif"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>tmean_yr <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/tmean_yr.tif"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>elevcc <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/elevcc.tif"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>forageFall <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/forageFall.tif"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>forageSpring <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/forageSpring.tif"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>forageSummer <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/forageSummer.tif"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>nesting <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/nesting.tif"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>insecticide <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="st">"data/insecticide.tif"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="rename-rasters" class="level3">
+<h3 class="anchored" data-anchor-id="rename-rasters">Rename rasters</h3>
+<p>When making these rasters, the <code>terra</code> package automatically generates names that aren’t always legible. Here we use the <code>names() &lt;-</code> function to rename the layers to something more understandable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rename layers for reference</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(prmean) <span class="ot">&lt;-</span> <span class="st">"prmean"</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tmean_yr) <span class="ot">&lt;-</span> <span class="st">"tmean"</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(elevcc) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"elev"</span>, <span class="st">"canopycov"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(forageSpring) <span class="ot">&lt;-</span> <span class="st">"forageSpring"</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(forageSummer) <span class="ot">&lt;-</span> <span class="st">"forageSummer"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(forageFall) <span class="ot">&lt;-</span> <span class="st">"forageFall"</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(nesting) <span class="ot">&lt;-</span> <span class="st">"nesting"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(insecticide) <span class="ot">&lt;-</span> <span class="st">"insecticide"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="create-occurence-grid-for-bombus-sitkensis" class="level2">
+<h2 class="anchored" data-anchor-id="create-occurence-grid-for-bombus-sitkensis">Create occurence grid for <em>Bombus sitkensis</em></h2>
+<p>We use the coordinates of the GBIF observations to convert into georeferenced points using the <code>vect</code> function in <code>terra</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>occ.vect <span class="ot">&lt;-</span> <span class="fu">vect</span>(occ[,<span class="fu">c</span>(<span class="st">"decimalLongitude"</span>,<span class="st">"decimalLatitude"</span>)], </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">geom =</span> <span class="fu">c</span>(<span class="st">"decimalLongitude"</span>,<span class="st">"decimalLatitude"</span>), <span class="co"># x and y columns</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">crs =</span> <span class="st">"epsg:4326"</span>)  <span class="co"># WGS 1984 geographic coordinate system</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(occ.vect)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03_occurrenceRecords_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="convert-the-observed-points-to-grid-cells" class="level3">
+<h3 class="anchored" data-anchor-id="convert-the-observed-points-to-grid-cells">Convert the observed points to grid cells</h3>
+<p>Using one of the environmental grids as a template, we convert the observation points from GBIF to a presence grid, where a grid cell value of <code>1</code> indicates that (any number of) observations were reported in that cell.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>occ.rast <span class="ot">&lt;-</span> <span class="fu">rasterize</span>(occ.vect <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">project</span>(prmean),   <span class="co"># project points to match projection</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                      prmean               <span class="co"># template raster</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                      )</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># rename the raster layers for reference</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(occ.rast) <span class="ot">&lt;-</span> <span class="st">"B_sitkensis"</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(occ.rast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03_occurrenceRecords_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="combine-presence-grid-with-environment-and-habitat-variables-and-extract-to-table" class="level3">
+<h3 class="anchored" data-anchor-id="combine-presence-grid-with-environment-and-habitat-variables-and-extract-to-table">Combine presence grid with environment and habitat variables and extract to table</h3>
+<p>We only need a table of presence grid cells and their associated habitat and environmental values. To do this, we can stack all the raster layers together (since they share the same projection and their grids are aligned). Then we can use the <code>terra</code> <code>values</code> function to extract the cell values of the stacked grids as rows in a table, keeping only the rows with <em>B. sitkensis</em> presences using the <code>filter</code> function from <code>dplyr</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># stack then environmental and habitat layers and the rasterized occurence points</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>occ.envr <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">list</span>(prmean, tmean_yr, elevcc, forageFall,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                      forageSpring, forageSummer, nesting, insecticide, occ.rast))</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>presence <span class="ot">&lt;-</span> <span class="fu">values</span>(occ.envr, <span class="at">dataframe =</span> <span class="cn">TRUE</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(B_sitkensis <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="create-background-points-grid" class="level2">
+<h2 class="anchored" data-anchor-id="create-background-points-grid">Create background points grid</h2>
+<p>Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space in the region. This means that background points:</p>
+<ul>
+<li>should be numerous enough to represent the region</li>
+<li>may overlap with the presence points</li>
+</ul>
+<p>The package <code>predicts</code> has a function that is useful for creating background points, <code>backgroundSample</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(predicts)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)   <span class="co"># background sampling is random. Setting seed to 100 ensures we get the same results</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>backgroundpts <span class="ot">&lt;-</span> <span class="fu">backgroundSample</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mask =</span> forageFall,          <span class="co"># mask restricts points to area of interest (defined by the forageFall)</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">n =</span> <span class="dv">10000</span>,                   <span class="co"># create 10000 background points</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>background <span class="ot">&lt;-</span> <span class="fu">extract</span>(occ.envr[[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]],    <span class="co"># only extracting the environmental/habitat layers</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                      backgroundpts       <span class="co"># extraction locations</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                      )</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># combine presence and background data</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>presback <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(presence, background) <span class="sc">|&gt;</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">B_sitkensis =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(B_sitkensis), <span class="dv">0</span>, B_sitkensis))   <span class="co"># replace NA (from background data) with 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Save the output!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(presback, <span class="st">"data/presback.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

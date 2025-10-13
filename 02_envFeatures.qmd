@@ -25,16 +25,20 @@ These resources take two different approaches to serving data, as you'll see.
 
 BeeSpatial has a point-and-click graphical user interface. We will use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step. [More information on using BeeSpatial can be found here.](https://climateecology.github.io/beespatial-tutorial/)
 
-![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg) For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
+![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
+
+For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
 
 -   Monthly maximum and minimum temperatures for 2020
 -   Monthly total precipitation for 2020
--   ~~*Pollinator foraging resource in spring, summer, and fall at 5km range for 2015-2023*~~
--   ~~*Pollinator nesting resources at 5km range for 2015-2023*~~
+
+We will also be getting pollinator habitat layers from BeeSpatial -- more on this later.
 
 ### Load the downloaded data
 
 ```{r}
+#| message: false
+
 library(terra)
 
 downloadpath <- "download/Oregon_raster_data/"   # change to your download location
@@ -78,9 +82,7 @@ Now looking at the attributes of the climate data, we see that the resolution va
 We will use `rlandfire` to get additional landscape data:
 
 -   Elevation
--   ~~*Vegetation cover*~~
-
-See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
+-   Canopy cover
 
 As a first step, load the package and use one of the climate layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the LANDFIRE data. We can use the `rlandfire` function `getAOI` to do this.
 
@@ -100,7 +102,7 @@ The AOI is specified in geographic coordinates, with is what is required by the 
 To request layers using `rlandfire` we have to specify the LANDFIRE products using their abbreviated names. The layers can be viewed [here](https://lfps.usgs.gov/products), which is also accessible using the package function `rlandfire::viewProducts()`. We will be selecting the elevation layer:
 
 -   `ELEV2020` = 2020 elevation
--   `200EVH` = existing vegetation height (not used)
+-   `200CC_20` = canopy cover
 
 ```{r}
 #| eval: false
@@ -122,6 +124,13 @@ resp <- landfireAPIv2(products = products,
                     verbose = FALSE)
 
 ```
+
+
+::: {.callout-note}
+
+See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
+
+:::
 
 ### Load the downloaded data
 
@@ -271,11 +280,19 @@ We can get some additional habitat quality layers from BeeSpatial:
 - Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)
 - Potential insecticide use based on typical practices in the state (in 2014)
 
+## Download pre-processed habitat quality layers
+
 These indices have been summarized to represent the weighted average value within 5km, using an exponential decay function as you go further from a given location (the pixel center). For more information on the forage nesting data, see [Koh et al. (2015)](https://doi.org/10.1073/pnas.1517685113) and for insecticide use, see [Douglas et al. (2022)](https://doi.org/10.1038/s41597-022-01584-z).
 
 Since these layers are 30m resolution, downloading them for the entire state of Oregon isn't practical for the workshop. Instead we've already processed them using the same projection and resampling steps as above to match the climate data layers.
 
-However, in case you're interested, the code to do this is here:
+These layers are already in the `data/` folder in your workspace. You can also download the pre-processed layers [**here**](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/data/habitatquality.zip).
+
+::: {.callout-caution icon=false collapse=true}
+
+## Extra: Pre-processing steps
+
+In case you're interested, the code for the pre-processing is below. You will need to download the corresponding layers from BeeSpatial on your own time, however.
 
 ```{r extra_30m}
 #| eval: false
@@ -298,11 +315,7 @@ forageSummer <- project(forageSummer30m, prmean)
 nesting <- project(nesting30m, prmean)
 insecticide <- project(insecticide30m, prmean)
 
-```
-
-```{r}
-#| echo: false
-#| eval: false
+# 3. Save the processed layers to your preferred location
 
 writeRaster(forageFall, "data/forageFall.tif")
 writeRaster(forageSpring, "data/forageSpring.tif")
@@ -311,3 +324,5 @@ writeRaster(nesting, "data/nesting.tif")
 writeRaster(insecticide, "data/insecticide.tif")
 
 ```
+
+:::
