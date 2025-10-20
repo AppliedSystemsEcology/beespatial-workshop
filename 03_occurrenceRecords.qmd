@@ -248,7 +248,8 @@ occ.envr <- rast(list(prmean, tmean_yr, elevcc, forageFall,
                       forageSpring, forageSummer, nesting, insecticide, occ.rast))
 
 
-presence <- values(occ.envr, dataframe = TRUE, na.rm = TRUE) |> filter(B_sitkensis == 1)
+presence <- as.data.frame(occ.envr, xy = T) %>% 
+  na.omit()
 
 ```
 
