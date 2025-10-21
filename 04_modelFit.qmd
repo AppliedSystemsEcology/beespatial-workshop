@@ -201,6 +201,13 @@ ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
   coord_equal() +
   theme_minimal() +
   labs(title = "Predicted Probability of Presence", fill = "Probability")
+
+# make prediction_df2 into a tif
+sdm_rast <- prediction_df2 %>% 
+  select(x,y,pred) %>% 
+  rast(type = "xyz")
+
+saveRDS(sdm_rast, "data/sdm_rast.tif")
 ```
 
 # 9. Continuous Boyce Index
