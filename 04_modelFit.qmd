@@ -13,16 +13,12 @@ library(terra)         # For raster data handling
 library(pROC)          # For calculating and plotting ROC curves
 library(ecospat)       # For calculating the Boyce Index
 library(ggplot2)       # For visualization
-library(purrr)         # Functional programming (used for looping with map_*)
 library(dplyr)         # Data manipulation
 ```
-
 
 ## Overview
 
 In this module, you'll build and evaluate a species distribution model for *Bombus sitkensis* using a Random Forest algorithm. You'll also generate spatial predictions, evaluate model performance, and visualize variable importance and response curves.
-
----
 
 # 0. QUICK Niche Theory Refresher
 
