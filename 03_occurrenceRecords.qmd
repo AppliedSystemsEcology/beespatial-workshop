@@ -33,7 +33,7 @@ This will bring up a file called **.Renviron**. Add your own credential informat
 
 ```{r}
 #| eval: false
-
+# TODO is "fakeuser" the account info for this workshop?
 GBIF_USER="fakeuser"
 GBIF_PWD="safe_fake_password_123"
 GBIF_EMAIL="fakeuser@gbif.org"
@@ -172,6 +172,8 @@ library(terra)
 
 prmean <- rast("data/prmean.tif")
 tmean_yr <- rast("data/tmean_yr.tif")
+tmax_yr <- rast("data/tmax_yr.tif")
+tmin_yr <- rast("data/tmin_yr.tif")
 elevcc <- rast("data/elevcc.tif")
 forageFall <- rast("data/forageFall.tif")
 forageSpring <- rast("data/forageSpring.tif")
@@ -191,6 +193,8 @@ When making these rasters, the `terra` package automatically generates names tha
 
 names(prmean) <- "prmean"
 names(tmean_yr) <- "tmean"
+names(tmax_yr) <- "tmax"
+names(tmin_yr) <- "tmin"
 names(elevcc) <- c("elev", "canopycov")
 names(forageSpring) <- "forageSpring"
 names(forageSummer) <- "forageSummer"
@@ -200,7 +204,7 @@ names(insecticide) <- "insecticide"
 
 ```
 
-## Create occurence grid for _Bombus sitkensis_
+## Create occurrence grid for _Bombus sitkensis_
 
 We use the coordinates of the GBIF observations to convert into georeferenced points using the `vect` function in `terra`. 
 
@@ -244,7 +248,7 @@ library(dplyr)
 
 # stack then environmental and habitat layers and the rasterized occurence points
 
-occ.envr <- rast(list(prmean, tmean_yr, elevcc, forageFall,
+occ.envr <- rast(list(prmean, tmean_yr, tmax_yr, tmin_yr, elevcc, forageFall,
                       forageSpring, forageSummer, nesting, insecticide, occ.rast))
 
 
@@ -255,9 +259,9 @@ presence <- as.data.frame(occ.envr, xy = T) %>%
 
 ## Create background points grid
 
-Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space in the region. This means that background points:
+Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space available to the species of interest in the region. This means that background points:
 
-- should be numerous enough to represent the region
+- should be numerous enough to represent the environmental variation across the region
 - may overlap with the presence points
 
 The package `predicts` has a function that is useful for creating background points, `backgroundSample`.
@@ -272,7 +276,7 @@ backgroundpts <- backgroundSample(
   n = 10000,                   # create 10000 background points
 )
 
-background <- extract(occ.envr[[1:9]],    # only extracting the environmental/habitat layers
+background <- terra::extract(occ.envr[[1:11]],    # only extracting the environmental/habitat layers
                       backgroundpts       # extraction locations
                       )
 

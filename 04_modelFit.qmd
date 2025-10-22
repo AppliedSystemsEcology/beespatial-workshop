@@ -80,7 +80,7 @@ We're not worrying about correlation today, because our focus is prediction, but
 
 ```{r}
 # Define modeling recipe specifying predictors and target variable
-rf_recipe <- recipe(presence ~ prmean + tmean + elev +
+rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
                       canopycov + forageFall + forageSpring +
                       forageSummer + nesting + insecticide,
                     data = train_data) %>%

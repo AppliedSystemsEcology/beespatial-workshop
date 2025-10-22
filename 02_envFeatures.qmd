@@ -69,7 +69,7 @@ tmin <- terra::project(tmin, "epsg:32610")   # 32610 indicates the EPSG code for
 tmax <- terra::project(tmax, "epsg:32610") 
 pr <- terra::project(pr, "epsg:32610")
 
-pr
+pr # TODO: What are we trying to show here?
 
 ```
 
@@ -110,7 +110,7 @@ To request layers using `rlandfire` we have to specify the LANDFIRE products usi
 products <- c("ELEV2020", "200CC_20")
 
 # additional parameters
-email <- "rlandfire@example.com"
+email <- "rlandfire@example.com"               # Replace with your email
 lfpath <- paste0(getwd(),"/download/lf.zip")   # change to your FULL download path
 projection <- 32610                            # UTM 10N
 resolution <- res(tmin)[1]                     # match climate data resolution
@@ -193,6 +193,9 @@ We simply use `mean()` to calculate the mean across month layers in the **tmean_
 ```{r}
 #| fig-cap: Calculated mean annual temperature.
 
+# TODO: Maybe we should we also do the yearly minimum and yearly maximum as those are more likely to effect the species distribution
+tmin_yr  <- min(tmin)
+tmax_yr  <- min(tmax)
 tmean_yr <- mean(tmean_mon)
 
 plot(tmean_yr)
@@ -235,7 +238,15 @@ It looks like there's a small difference resolution. If you compare the actual v
 
 ### Resample
 
-To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use the **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.
+To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling. 
+
+::: {.callout-caution icon=false collapse=true}
+
+### Downscaling vs. Interpolation
+
+It is worth noting that simple interpolation methods (like bilinear interpolation) only smooth the existing data and they do not add new information or detail to the original course resolution data. For example, if you had 4km weather data and wanted to perform modeling at 1km, resampling with any of the simple interpolation methods would allow you to model at a finer resolution, but the underlying information would still, effectively, be at a 4km resolution.  Instead, you would need to use statistical downscaling, dynamic downscaling, or a purpose build machine learning algorithm.
+:::
+
 
 ```{r}
 
@@ -268,6 +279,8 @@ all.equal(ext(prmean), ext(elevcc2))
 
 writeRaster(prmean, "data/prmean.tif")
 writeRaster(tmean_yr, "data/tmean_yr.tif")
+writeRaster(tmean_yr, "data/tmax_yr.tif")
+writeRaster(tmean_yr, "data/tmin_yr.tif")
 writeRaster(elevcc2, "data/elevcc.tif")
 
 ```
