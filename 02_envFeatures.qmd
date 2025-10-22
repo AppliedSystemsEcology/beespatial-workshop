@@ -69,7 +69,7 @@ tmin <- terra::project(tmin, "epsg:32610")   # 32610 indicates the EPSG code for
 tmax <- terra::project(tmax, "epsg:32610") 
 pr <- terra::project(pr, "epsg:32610")
 
-pr # TODO: What are we trying to show here?
+pr
 
 ```
 
@@ -193,7 +193,6 @@ We simply use `mean()` to calculate the mean across month layers in the **tmean_
 ```{r}
 #| fig-cap: Calculated mean annual temperature.
 
-# TODO: Maybe we should we also do the yearly minimum and yearly maximum as those are more likely to effect the species distribution
 tmin_yr  <- min(tmin)
 tmax_yr  <- min(tmax)
 tmean_yr <- mean(tmean_mon)

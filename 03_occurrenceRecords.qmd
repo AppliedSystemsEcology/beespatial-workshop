@@ -33,7 +33,6 @@ This will bring up a file called **.Renviron**. Add your own credential informat
 
 ```{r}
 #| eval: false
-# TODO is "fakeuser" the account info for this workshop?
 GBIF_USER="fakeuser"
 GBIF_PWD="safe_fake_password_123"
 GBIF_EMAIL="fakeuser@gbif.org"
