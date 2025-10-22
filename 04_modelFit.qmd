@@ -7,6 +7,7 @@ format: html
 knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
 # Load all required packages for modeling and visualization
 library(tidymodels)    # Framework for modeling workflows and tuning
+library(themis)        # For handling class imbalance
 library(rnaturalearth) # Access to natural earth map data for countries, states
 library(sf)            # For working with vector spatial data (shapefiles, etc.)
 library(terra)         # For raster data handling
@@ -84,6 +85,7 @@ rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
                       canopycov + forageFall + forageSpring +
                       forageSummer + nesting + insecticide,
                     data = train_data) %>%
+  step_downsample(presence) %>% # TODO: Explain why this works or do with/without
   step_normalize(all_predictors())  # Normalize predictors (optional for RF)
 ```
 
@@ -207,7 +209,7 @@ sdm_rast <- prediction_df2 %>%
   select(x,y,pred) %>% 
   rast(type = "xyz")
 
-saveRDS(sdm_rast, "data/sdm_rast.tif")
+writeRaster(sdm_rast, "data/sdm_rast.tif")
 ```
 
 # 9. Continuous Boyce Index
