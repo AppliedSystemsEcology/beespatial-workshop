@@ -5,16 +5,6 @@ format: html
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
-# Load all required packages for modeling and visualization
-library(tidymodels)    # Framework for modeling workflows and tuning
-library(themis)        # For handling class imbalance
-library(rnaturalearth) # Access to natural earth map data for countries, states
-library(sf)            # For working with vector spatial data (shapefiles, etc.)
-library(terra)         # For raster data handling
-library(pROC)          # For calculating and plotting ROC curves
-library(ecospat)       # For calculating the Boyce Index
-library(ggplot2)       # For visualization
-library(dplyr)         # Data manipulation
 ```
 
 ## Overview
@@ -33,6 +23,10 @@ We’ll load the presence/background dataset and rename the response variable.
 Then we’ll split the data into training (80%) and testing (20%) sets, stratified by presence.
 
 ```{r}
+
+library(dplyr)         # Data manipulation
+library(tidymodels)    # Framework for modeling workflows and tuning
+
 # Load presence-background data and rename target variable
 pb <- readRDS("data/presback.rds") %>%
   rename(presence = B_sitkensis)
@@ -52,13 +46,17 @@ test_data <- testing(data_split)
 We’ll visualize the training and test points over the study area (Oregon) for context.
 
 ```{r}
+
+library(sf)            # For working with vector spatial data (shapefiles, etc.)
+library(terra)         # For raster data handling
+library(ggplot2)       # For visualization
+
 # Load raster for projection reference
 tmean_yr <- rast("data/tmean_yr.tif")
 
-# Load map of Oregon using rnaturalearth, transform to raster CRS
-or <- ne_states(country = "United States of America", returnclass = "sf") %>%
-  st_transform(st_crs(tmean_yr)) %>%
-  filter(name == "Oregon")
+# Load shapefile of Oregon and convert to sf object
+or <- vect("data/Oregon.shp") %>% 
+  st_as_sf()
 
 # Visualize training and testing data points on the map
 # Blue = training, Gold = testing
@@ -80,6 +78,9 @@ In tidymodels, a 'recipe' is a structured sequence of preprocessing steps applie
 We're not worrying about correlation today, because our focus is prediction, but if interpreting response curves or variable importance were a key outcome of the model, we would need to think more carefully about dealing with correlated variables. 
 
 ```{r}
+
+library(themis)        # For handling class imbalance
+
 # Define modeling recipe specifying predictors and target variable
 rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
                       canopycov + forageFall + forageSpring +
@@ -139,7 +140,8 @@ tuned_rf <- tune_grid(
   resamples = cv_folds,
   grid = rf_grid,
   metrics = metric_set(roc_auc),
-  control = control_grid(save_pred = TRUE)
+  control = control_grid(save_pred = TRUE,
+                         verbose = TRUE)
 )
 
 # Select best parameters by highest ROC AUC
@@ -167,6 +169,9 @@ The AUC (Area Under the ROC Curve) measures the model's ability to discriminate 
 The ROC (Receiver Operating Characteristic) curve shows the tradeoff between True Positive Rate (sensitivity) and False Positive Rate (1 - specificity) across different threshold values. A model with curves closer to the top-left corner performs better.
 
 ```{r}
+
+library(pROC)          # For calculating and plotting ROC curves
+
 # Predict probabilities on test set
 rf_predictions <- predict(final_rf_fit, test_data, type = "prob") %>%
   bind_cols(test_data)
@@ -223,6 +228,9 @@ Values range from -1 to +1:
   -1 indicates counter-predictive performance (presences fall in low-suitability areas).
 
 ```{r}
+
+library(ecospat)       # For calculating the Boyce Index
+
 # Evaluate model calibration using the Continuous Boyce Index
 presence_preds <- rf_predictions %>%
   filter(presence == 1) %>%
@@ -271,7 +279,7 @@ predict_response_curve <- function(var_name, model, data, n = 100) {
                    max(data[[var_name]], na.rm = TRUE), length.out = n)
   
   base_data <- data %>%
-    summarise(across(c(prmean, tmean, elev,
+    summarise(across(c(prmean, tmean, tmax, tmin, elev, 
                        canopycov, forageFall, forageSpring, 
                        forageSummer, nesting, insecticide),
                      median, na.rm = TRUE))
@@ -285,7 +293,7 @@ predict_response_curve <- function(var_name, model, data, n = 100) {
 }
 
 # Create response curves for each predictor
-predictor_vars <- c("prmean","tmean","elev",
+predictor_vars <- c("prmean","tmean","tmax", "tmin", "elev",
                     "canopycov", "forageFall", "forageSpring",
                     "forageSummer", "nesting", "insecticide")
 
