@@ -110,7 +110,7 @@ To request layers using `rlandfire` we have to specify the LANDFIRE products usi
 products <- c("ELEV2020", "200CC_20")
 
 # additional parameters
-email <- "rlandfire@example.com"               # Replace with your email
+email <- "youremail@example.com"               # Replace with your email
 lfpath <- paste0(getwd(),"/download/lf.zip")   # change to your FULL download path
 projection <- 32610                            # UTM 10N
 resolution <- res(tmin)[1]                     # match climate data resolution
