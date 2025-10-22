@@ -29,7 +29,7 @@ usethis::edit_r_environ()
 
 ```
 
-This will bring up a file called **.Renviron**. Add your own credential information here (replace the info in quotes with your info), or you can use the account info that we've provided for this workshop.
+This will bring up a file called **.Renviron**. Add your own credential information here (replace the info in quotes with your info), or you can use the account info that WE WILL PROVIDE AT THE WORKSHOP. 
 
 ```{r}
 #| eval: false
