@@ -15,8 +15,11 @@ For this workshop we will use the `renv` package to create a reproducible R envi
 
 ```{r}
 #| eval: false
+if (!require("renv")) {
+  install.packages("renv")
+}
 
-install.packages("renv")
+library(renv)
 
 ```
 
