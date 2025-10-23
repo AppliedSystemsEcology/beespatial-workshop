@@ -289,11 +289,11 @@ final_rf_fit <- fit(final_rf_workflow, data = train_data)
 # Predict probability of presence across the landscape
 predictions_on_map <- predict(final_rf_fit, new_data = prediction_df, type = "prob")
 
-prediction_df2 <- prediction_df %>%
+prediction_df2_nodown <- prediction_df %>%
   mutate(pred = predictions_on_map$.pred_1)
 
 # Visualize predictions as a raster map
-ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
+ggplot(prediction_df2_nodown, aes(x = x, y = y, fill = pred)) +
   geom_tile() +
   scale_fill_viridis_c() +
   coord_equal() +
