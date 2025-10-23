@@ -22,7 +22,7 @@ Today, we will be focusing on Abiotic (A) and Biotic (B) factors, but we will no
 We’ll load the presence/background dataset and rename the response variable.
 Then we’ll split the data into training (80%) and testing (20%) sets, stratified by presence.
 
-```{r}
+```{r, message=FALSE}
 
 library(dplyr)         # Data manipulation
 library(tidymodels)    # Framework for modeling workflows and tuning
@@ -45,7 +45,7 @@ test_data <- testing(data_split)
 
 We’ll visualize the training and test points over the study area (Oregon) for context.
 
-```{r}
+```{r, message=FALSE}
 
 library(sf)            # For working with vector spatial data (shapefiles, etc.)
 library(terra)         # For raster data handling
@@ -77,7 +77,7 @@ In tidymodels, a 'recipe' is a structured sequence of preprocessing steps applie
 
 We're not worrying about correlation today, because our focus is prediction, but if interpreting response curves or variable importance were a key outcome of the model, we would need to think more carefully about dealing with correlated variables. 
 
-```{r}
+```{r, message=FALSE}
 
 library(themis)        # For handling class imbalance
 
@@ -86,7 +86,7 @@ rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
                       canopycov + forageFall + forageSpring +
                       forageSummer + nesting + insecticide,
                     data = train_data) %>%
-  step_downsample(presence) %>% # TODO: Explain why this works or do with/without
+  step_downsample(presence) %>% #removes rows of a dataset to make factor levels equal  
   step_normalize(all_predictors())  # Normalize predictors (optional for RF)
 ```
 
@@ -113,7 +113,7 @@ We’ll combine the recipe and model into a workflow, then use 5-fold cross-vali
 
 This step will take a few minutes to process.
 
-```{r}
+```{r, message=FALSE}
 # Combine recipe and model into a single workflow
 rf_workflow <- workflow() %>%
   add_model(rf_model) %>%
@@ -168,7 +168,7 @@ The AUC (Area Under the ROC Curve) measures the model's ability to discriminate 
 
 The ROC (Receiver Operating Characteristic) curve shows the tradeoff between True Positive Rate (sensitivity) and False Positive Rate (1 - specificity) across different threshold values. A model with curves closer to the top-left corner performs better.
 
-```{r}
+```{r, message=FALSE}
 
 library(pROC)          # For calculating and plotting ROC curves
 
@@ -210,12 +210,99 @@ ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
   labs(title = "Predicted Probability of Presence", fill = "Probability")
 
 # make prediction_df2 into a tif
-sdm_rast <- prediction_df2 %>% 
-  select(x,y,pred) %>% 
-  rast(type = "xyz")
-
-writeRaster(sdm_rast, "data/sdm_rast.tif")
+#sdm_rast <- prediction_df2 %>% 
+#  select(x,y,pred) %>% 
+#  rast(type = "xyz")
+#
+#writeRaster(sdm_rast, "data/sdm_rast.tif")
 ```
+
+
+::: {.callout-caution icon=false collapse=true}
+
+## Extra: Challenges of unbalanced classifcations in RF models
+
+In case you're interested, here is the output of a model that doesn't downsample background points to match the number of presence points. Note the model will take much longer to run because there are far more data points (~10,000 more background points) that the model is being fit to. How do the results differ?
+
+```{r extra_plotNoDownSample}
+#| eval: false
+
+# Extra info: What happens if we don't downsample?
+
+# Define modeling recipe specifying predictors and target variable
+rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
+                      canopycov + forageFall + forageSpring +
+                      forageSummer + nesting + insecticide,
+                    data = train_data) %>%
+ # step_downsample(presence) %>% no more downsampling
+  step_normalize(all_predictors())  # Normalize predictors (optional for RF)
+
+# Define a Random Forest model using the parsnip package
+# 'tune()' allows tuning of hyperparameters during cross-validation
+rf_model <- rand_forest(
+  mtry = tune(),
+  min_n = tune(),
+  trees = 500
+) %>%
+  set_engine("ranger", importance = "permutation") %>% # model engine specifies that the method of estimation, which is the ranger package
+  set_mode("classification")
+
+# Combine recipe and model into a single workflow
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(rf_recipe)
+
+# Create 5-fold cross-validation folds
+set.seed(234)
+cv_folds <- vfold_cv(train_data, v = 5, strata = presence)
+
+# Define random grid for hyperparameter tuning
+# 'mtry' controls how many predictors are randomly selected at each tree split — smaller values increase randomness.
+# 'min_n' sets the minimum number of observations in a terminal node (a smaller value allows deeper trees).
+# Tuning these parameters helps balance model complexity and generalization.
+rf_grid <- grid_random(
+  mtry(range = c(1, 9)),
+  min_n(range = c(5, 20)),
+  size = 10
+)
+
+# Tune the model using ROC AUC as performance metric
+set.seed(345)
+tuned_rf <- tune_grid(
+  rf_workflow,
+  resamples = cv_folds,
+  grid = rf_grid,
+  metrics = metric_set(roc_auc),
+  control = control_grid(save_pred = TRUE,
+                         verbose = TRUE)
+)
+
+# Select best parameters by highest ROC AUC
+best_params <- select_best(tuned_rf, metric = "roc_auc")
+
+# Finalize workflow with best hyperparameters
+final_rf_workflow <- finalize_workflow(rf_workflow, best_params)
+
+# Fit the final model to the full training dataset
+final_rf_fit <- fit(final_rf_workflow, data = train_data)
+
+# Predict probability of presence across the landscape
+predictions_on_map <- predict(final_rf_fit, new_data = prediction_df, type = "prob")
+
+prediction_df2 <- prediction_df %>%
+  mutate(pred = predictions_on_map$.pred_1)
+
+# Visualize predictions as a raster map
+ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Predicted Probability of Presence", fill = "Probability")
+```
+
+:::
+
 
 # 9. Continuous Boyce Index
 
@@ -227,7 +314,7 @@ Values range from -1 to +1:
   - 0 means random prediction, and
   -1 indicates counter-predictive performance (presences fall in low-suitability areas).
 
-```{r}
+```{r, message=FALSE}
 
 library(ecospat)       # For calculating the Boyce Index
 
