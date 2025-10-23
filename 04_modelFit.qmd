@@ -96,6 +96,7 @@ We define a Random Forest model and specify parameters (mtry, min_n) for tuning.
 The engine ranger is fast and supports permutation-based variable importance.
 
 ```{r}
+library(ranger)
 # Define a Random Forest model using the parsnip package
 # 'tune()' allows tuning of hyperparameters during cross-validation
 rf_model <- rand_forest(
