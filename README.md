@@ -13,6 +13,6 @@ load_pkgs <- function(pkgs) {
 pkgs <- c("terra", "rlandfire", "rgbif",
           "dplyr", "predicts", "tidymodels",
           "sf", "ggplot2", "themis", "pROC",
-          "ecospat")
+          "ecospat", "ranger", "usethis")
 load_pkgs(pkgs)
 ```
