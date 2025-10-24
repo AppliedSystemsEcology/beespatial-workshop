@@ -6,7 +6,7 @@ If there are issues recreating the environment with `renv` all required packages
 ```
 load_pkgs <- function(pkgs) {
   inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
-  for(p in inst_pkgs) install.packages(p)
+  for(p in inst_pkgs) install.packages(p, ask = FALSE)
   sapply(pkgs,require,character=TRUE)
 }
 
