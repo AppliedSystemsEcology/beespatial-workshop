@@ -17,8 +17,6 @@ website:
         href: 03_occurrenceRecords.qmd
       - text: "4 Fitting a model"
         href: 04_modelFit.qmd
-      - text: "5 Data visualization"
-        href: 05_dataVis.qmd
 
 format:
   html:

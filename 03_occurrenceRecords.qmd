@@ -3,7 +3,12 @@ title: "Occurrence Records"
 format: html
 ---
 
-# Use `rgbif` to get occurrence records
+## Overview
+
+- Retrieve occurrence records for *Bombus sitkensis* from the Global Biodiversity Information Facility (GBIF)
+- Process these records along with the environmental rasters to create presence and background points to use for fitting the species distribution model
+
+# 1. Use `rgbif` to get occurrence records
 
 The package `rgbif` enables you to access GBIF's API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.
 
@@ -30,7 +35,7 @@ usethis::edit_r_environ()
 
 ```
 
-This will bring up a file called **.Renviron**. Replace your own credential information below (replace the info in quotes with your info), or you can use the account info that we will provide for this workshop. Then, coy this information into the .Renviron file and save it. You must restart your R session by going to the Session tab > Restart R. 
+This will bring up a file called **.Renviron**. Replace your own credential information below (replace the info in quotes with your info), or you can use the account info that we will provide for this workshop. Then, copy this information into the .Renviron file and save it. You must restart your R session by going to the Session tab > Restart R. 
 
 GBIF_USER="your_username"
 
@@ -46,10 +51,9 @@ library(rgbif)
 
 ```
 
-
 ## Get the GBIF taxon key
 
-Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information is missing. We can use the function `rgbif::name_backbone()` to identify the GBIF taxon key that will return precise taxon matches.
+Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information are missing. We can use the function `rgbif::name_backbone()` to identify the **GBIF taxon key** that will return precise taxon matches.
 
 ```{r taxonkey}
 #| message: false
@@ -165,7 +169,7 @@ occ <- occ_download_get(gbif_download) |> occ_download_import()
 occ <- readRDS("data/occ.rds")
 ```
 
-# Process occurence data
+# 2. Process occurence data
 
 ## Load environmental and habitat rasters
 
@@ -231,8 +235,8 @@ Using one of the environmental grids as a template, we convert the observation p
 ```{r}
 
 occ.rast <- rasterize(occ.vect |> 
-                        project(prmean),   # project points to match projection
-                      prmean               # template raster
+                        terra::project(prmean),   # project points to match projection
+                      prmean                      # template raster
                       )
 
 # rename the raster layers for reference
@@ -258,8 +262,8 @@ occ.envr <- rast(list(prmean, tmean_yr, tmax_yr, tmin_yr, elevcc, forageFall,
                       forageSpring, forageSummer, nesting, insecticide, occ.rast))
 
 
-presence <- as.data.frame(occ.envr, xy = T) %>% 
-  na.omit()
+presence <- as.data.frame(occ.envr, xy = TRUE) |> 
+  na.omit()   # drop rows where B_sitkensis occurence is NA
 
 ```
 
@@ -278,12 +282,12 @@ library(predicts)
 set.seed(100)   # background sampling is random. Setting seed to 100 ensures we get the same results
 
 backgroundpts <- backgroundSample(
-  mask = forageFall,          # mask restricts points to area of interest (defined by the forageFall)
+  mask = forageFall,           # mask restricts points to area of interest (defined by the forageFall)
   n = 10000,                   # create 10000 background points
 )
 
 background <- terra::extract(occ.envr[[1:11]],    # only extracting the environmental/habitat layers
-                      backgroundpts       # extraction locations
+                      backgroundpts               # extraction locations
                       )
 
 # combine presence and background data

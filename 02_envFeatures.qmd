@@ -3,13 +3,13 @@ title: "Study Area and Environmental Features"
 format: html
 ---
 
-# Objectives
+## Overview
 
 -   Identify some landscape online data resources that can be used for insect distribution mapping
 
 -   Load GIS data layers into R and clean and visualize them in preparation for modeling
 
-# Landscape data resources
+# 1. Landscape data resources
 
 We'll be downloading data using two different resources that serve landscape data to researchers:
 
@@ -23,7 +23,11 @@ These resources take two different approaches to serving data, as you'll see.
 
 ### Download BeeSpatial data
 
-BeeSpatial has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step. [More information on using BeeSpatial can be found here.](https://climateecology.github.io/beespatial-tutorial/)
+BeeSpatial has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step.
+
+::: callout-note
+See the [BeeSpatial tutorial](https://climateecology.github.io/beespatial-tutorial/) for more information about this tool.
+:::
 
 ![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
 
@@ -99,7 +103,7 @@ aoi
 
 The AOI is specified in geographic coordinates, with is what is required by the LANDFIRE API that `rlandfire` is talking to.
 
-To request layers using `rlandfire` we have to specify the LANDFIRE products using their abbreviated names. The layers can be viewed [here](https://lfps.usgs.gov/products), which is also accessible using the package function `rlandfire::viewProducts()`. We will be selecting the elevation layer:
+To request layers with `rlandfire` we have to specify the LANDFIRE products using their abbreviated names. The layers can be viewed [here](https://lfps.usgs.gov/products), which is also accessible using the package function `rlandfire::viewProducts()`. We will be selecting the elevation layer:
 
 -   `ELEV2020` = 2020 elevation
 -   `200CC_20` = canopy cover
@@ -125,11 +129,8 @@ resp <- landfireAPIv2(products = products,
 
 ```
 
-
-::: {.callout-note}
-
+::: callout-note
 See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
-
 :::
 
 ### Load the downloaded data
@@ -145,11 +146,11 @@ plot(elevcc)
 
 ```
 
-# Data aggregation and cleaning
+# 2. Data aggregation and cleaning
 
 We need to prepare these data layers for analysis. This means:
 
-1.  We need the layers to represent the desired inputs of our species distribution model.  
+1.  We need the layers to represent the desired inputs of our species distribution model.\
 2.  We need the pixels of each layer to match with the corresponding pixels in the other layers.
 
 ## Prepare model inputs
@@ -171,10 +172,10 @@ As you can see, this data is comprised of 12 layers. Each layer represents the m
 
 To get a mean annual temperature raster, we will combine the monthly min (**tmin**) and max (**tmax**) temperature layers in this way:
 
-1. Average **tmin** and **tmax** pixels for each month to get a monthly mean --> **tmean_mon**
-2. Average monthly means across the year to get the average temperature for the year --> *tmean_yr**
+1.  Average **tmin** and **tmax** pixels for each month to get a monthly mean --\> **tmean_mon**
+2.  Average monthly means across the year to get the average temperature for the year --\> \*tmean_yr\*\*
 
-#### 1. Calculate monthly mean temperature `tmean_mon`
+#### Calculate monthly mean temperature `tmean_mon`
 
 We can calculate the monthly average for each month by simply adding the **tmin** and **tmax** rasters and dividing by two. This is possible because these rasters' layers match so that the first layer (January) of **tmin** is added to the first layer of **tmax** and divided by two, etc.
 
@@ -186,7 +187,7 @@ tmean_mon <- (tmin + tmax)/2
 plot(tmean_mon)
 ```
 
-#### 2. Calculate annual mean temperature `tmean_yr`
+#### Calculate annual mean temperature `tmean_yr`
 
 We simply use `mean()` to calculate the mean across month layers in the **tmean_mon** raster.
 
@@ -237,15 +238,13 @@ It looks like there's a small difference resolution. If you compare the actual v
 
 ### Resample
 
-To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling. 
+To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.
 
-::: {.callout-caution icon=false collapse=true}
-
+::: {.callout-caution icon="false" collapse="true"}
 ### Downscaling vs. Interpolation
 
-It is worth noting that simple interpolation methods (like bilinear interpolation) only smooth the existing data and they do not add new information or detail to the original course resolution data. For example, if you had 4km weather data and wanted to perform modeling at 1km, resampling with any of the simple interpolation methods would allow you to model at a finer resolution, but the underlying information would still, effectively, be at a 4km resolution.  Instead, you would need to use statistical downscaling, dynamic downscaling, or a purpose build machine learning algorithm.
+It is worth noting that simple interpolation methods (like bilinear interpolation) only smooth the existing data and they do not add new information or detail to the original course resolution data. For example, if you had 4km weather data and wanted to perform modeling at 1km, resampling with any of the simple interpolation methods would allow you to model at a finer resolution, but the underlying information would still, effectively, be at a 4km resolution. Instead, you would need to use statistical downscaling, dynamic downscaling, or a purpose build machine learning algorithm.
 :::
-
 
 ```{r}
 
@@ -284,13 +283,13 @@ writeRaster(elevcc2, "data/elevcc.tif")
 
 ```
 
-# Pollinator habitat quality layers
+# 3. Pollinator habitat quality layers
 
 We can get some additional habitat quality layers from BeeSpatial:
 
-- Seasonal pollinator forage (spring, summer, and fall)
-- Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)
-- Potential insecticide use based on typical practices in the state (in 2014)
+-   Seasonal pollinator forage (spring, summer, and fall)
+-   Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)
+-   Potential insecticide use based on typical practices in the state (in 2014)
 
 ## Download pre-processed habitat quality layers
 
@@ -300,8 +299,7 @@ Since these layers are 30m resolution, downloading them for the entire state of 
 
 These layers are already in the `data/` folder in your workspace. You can also download the pre-processed layers [**here**](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/data/habitatquality.zip).
 
-::: {.callout-caution icon=false collapse=true}
-
+::: {.callout-caution icon="false" collapse="true"}
 ## Extra: Pre-processing steps
 
 In case you're interested, the code for the pre-processing is below. You will need to download the corresponding layers from BeeSpatial on your own time, however.
@@ -336,5 +334,4 @@ writeRaster(nesting, "data/nesting.tif")
 writeRaster(insecticide, "data/insecticide.tif")
 
 ```
-
 :::
