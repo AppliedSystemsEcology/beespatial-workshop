@@ -119,25 +119,20 @@ lfpath <- paste0(getwd(),"/download/lf.zip")   # change to your FULL download pa
 projection <- 32610                            # UTM 10N
 resolution <- res(tmin)[1]                     # match climate data resolution
 
-resp <- landfireAPIv2(products = products,
+elevcc <- landfireAPIv2(products = products,
                     aoi = aoi, 
                     projection = projection,
                     resolution = resolution,
                     email = email,
                     path = lfpath,
-                    verbose = FALSE)
-
+                    verbose = FALSE) %>%
+          landfireVSI()                        # Reads the LANDFIRE data without
+                                               # needing to unzip the directory
+plot(elevcc)
 ```
 
-::: callout-note
-See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
-:::
-
-### Load the downloaded data
-
-In order to load the layers into R, unzip the file at the location you indicated in `lfpath`. We want the file with the extension '.tif'. The filename is long and uninformative, so we've already renamed it to 'elevcc.tif' for these directions. From plotting, we see that the two layers we requested are stacked in a single raster.
-
 ```{r}
+#| echo: false
 #| fig-cap: Elevation and canopy cover data from LANDFIRE.
 
 elevcc <- rast(paste0(downloadpath, "elevcc.tif"))
@@ -145,6 +140,10 @@ elevcc <- rast(paste0(downloadpath, "elevcc.tif"))
 plot(elevcc)
 
 ```
+
+::: callout-note
+See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
+:::
 
 # 2. Data aggregation and cleaning
 

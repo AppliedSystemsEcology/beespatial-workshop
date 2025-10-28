@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-b2c493fdd487b110f6b1348dfd6a5174.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d07e4899fb10a1c5c27d7543a37cc619.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -192,7 +192,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#rlandfire" id="toc-rlandfire" class="nav-link" data-scroll-target="#rlandfire"><code>rlandfire</code></a>
   <ul class="collapse">
   <li><a href="#download-rlandfire-data" id="toc-download-rlandfire-data" class="nav-link" data-scroll-target="#download-rlandfire-data">Download <code>rlandfire</code> data</a></li>
-  <li><a href="#load-the-downloaded-data-1" id="toc-load-the-downloaded-data-1" class="nav-link" data-scroll-target="#load-the-downloaded-data-1">Load the downloaded data</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#data-aggregation-and-cleaning" id="toc-data-aggregation-and-cleaning" class="nav-link" data-scroll-target="#data-aggregation-and-cleaning">2. Data aggregation and cleaning</a>
@@ -368,13 +367,26 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>projection <span class="ot">&lt;-</span> <span class="dv">32610</span>                            <span class="co"># UTM 10N</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>resolution <span class="ot">&lt;-</span> <span class="fu">res</span>(tmin)[<span class="dv">1</span>]                     <span class="co"># match climate data resolution</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>resp <span class="ot">&lt;-</span> <span class="fu">landfireAPIv2</span>(<span class="at">products =</span> products,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>elevcc <span class="ot">&lt;-</span> <span class="fu">landfireAPIv2</span>(<span class="at">products =</span> products,</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">aoi =</span> aoi, </span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">projection =</span> projection,</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resolution =</span> resolution,</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">email =</span> email,</span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">path =</span> lfpath,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">verbose =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>          <span class="fu">landfireVSI</span>()                        <span class="co"># Reads the LANDFIRE data without</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                                               <span class="co"># needing to unzip the directory</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(elevcc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Elevation and canopy cover data from LANDFIRE.</figcaption>
+</figure>
+</div>
+</div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -387,23 +399,6 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p>See the <a href="https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html"><code>rlandfire</code> tutorial</a> for more background about these steps.</p>
-</div>
-</div>
-</section>
-<section id="load-the-downloaded-data-1" class="level3">
-<h3 class="anchored" data-anchor-id="load-the-downloaded-data-1">Load the downloaded data</h3>
-<p>In order to load the layers into R, unzip the file at the location you indicated in <code>lfpath</code>. We want the file with the extension ‘.tif’. The filename is long and uninformative, so we’ve already renamed it to ‘elevcc.tif’ for these directions. From plotting, we see that the two layers we requested are stacked in a single raster.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>elevcc <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(downloadpath, <span class="st">"elevcc.tif"</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(elevcc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="02_envFeatures_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Elevation and canopy cover data from LANDFIRE.</figcaption>
-</figure>
-</div>
 </div>
 </div>
 </section>
@@ -422,7 +417,7 @@ Note
 <p>For our species distribution model, we are planning to use <strong>mean precipitation</strong>, <strong>mean temperature</strong>, and <strong>elevation</strong> as inputs. We already have elevation.</p>
 <p>Let’s look at the climate data from BeeSpatial. This data originates from the <a href="https://prism.oregonstate.edu/">PRISM group</a>, which produces weather raster layers from climate station data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -444,9 +439,9 @@ Note
 <h4 class="anchored" data-anchor-id="calculate-monthly-mean-temperature-tmean_mon">Calculate monthly mean temperature <code>tmean_mon</code></h4>
 <p>We can calculate the monthly average for each month by simply adding the <strong>tmin</strong> and <strong>tmax</strong> rasters and dividing by two. This is possible because these rasters’ layers match so that the first layer (January) of <strong>tmin</strong> is added to the first layer of <strong>tmax</strong> and divided by two, etc.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>tmean_mon <span class="ot">&lt;-</span> (tmin <span class="sc">+</span> tmax)<span class="sc">/</span><span class="dv">2</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_mon)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tmean_mon <span class="ot">&lt;-</span> (tmin <span class="sc">+</span> tmax)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_mon)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -461,11 +456,11 @@ Note
 <h4 class="anchored" data-anchor-id="calculate-annual-mean-temperature-tmean_yr">Calculate annual mean temperature <code>tmean_yr</code></h4>
 <p>We simply use <code>mean()</code> to calculate the mean across month layers in the <strong>tmean_mon</strong> raster.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tmin_yr  <span class="ot">&lt;-</span> <span class="fu">min</span>(tmin)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>tmax_yr  <span class="ot">&lt;-</span> <span class="fu">min</span>(tmax)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tmean_yr <span class="ot">&lt;-</span> <span class="fu">mean</span>(tmean_mon)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_yr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>tmin_yr  <span class="ot">&lt;-</span> <span class="fu">min</span>(tmin)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tmax_yr  <span class="ot">&lt;-</span> <span class="fu">min</span>(tmax)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>tmean_yr <span class="ot">&lt;-</span> <span class="fu">mean</span>(tmean_mon)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tmean_yr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -481,7 +476,7 @@ Note
 <h3 class="anchored" data-anchor-id="data-aggregation-calculate-mean-annual-precipitation-prmean">Data aggregation: Calculate mean annual precipitation <code>prmean</code></h3>
 <p>Calculating the mean annual precipitation (<code>prmean</code>) uses the same approach as calculating the mean annual temperature from monthly means.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prmean <span class="ot">&lt;-</span> <span class="fu">mean</span>(pr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>prmean <span class="ot">&lt;-</span> <span class="fu">mean</span>(pr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -490,7 +485,7 @@ Note
 <p>To overlay these raster day from different sources, we need to check if they have the same <strong>projection</strong>, <strong>resolution</strong>, and <strong>alignment</strong>.</p>
 <p>Check if the climate data and LANDFIRE data have the same projection. We’re only checking <code>prmean</code> and <code>elev</code>, but you can use the same code to check the other layers.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(<span class="fu">crs</span>(prmean), <span class="fu">crs</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(<span class="fu">crs</span>(prmean), <span class="fu">crs</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -498,7 +493,7 @@ Note
 <p>We expected the projection to be the same because we requested a specific projection in <code>rlandfire</code>.</p>
 <p>Check if the resolution is the same.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Mean relative difference: 6.449424e-05"</code></pre>
 </div>
@@ -524,21 +519,21 @@ Downscaling vs.&nbsp;Interpolation
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>elevcc2 <span class="ot">&lt;-</span> <span class="fu">resample</span>(elevcc,              <span class="co"># layer to be resampled</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                    prmean,              <span class="co"># target grid to base resampling on</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">"bilinear"</span>  <span class="co"># method is bilinear interpolation</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>elevcc2 <span class="ot">&lt;-</span> <span class="fu">resample</span>(elevcc,              <span class="co"># layer to be resampled</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                    prmean,              <span class="co"># target grid to base resampling on</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">"bilinear"</span>  <span class="co"># method is bilinear interpolation</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we can check if these layers share the same resolution:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">res</span>(prmean), <span class="fu">res</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
 <p>And if their extents are the same:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">ext</span>(prmean), <span class="fu">ext</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">ext</span>(prmean), <span class="fu">ext</span>(elevcc2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -573,31 +568,31 @@ Extra: Pre-processing steps
 <div class="callout-body-container callout-body">
 <p>In case you’re interested, the code for the pre-processing is below. You will need to download the corresponding layers from BeeSpatial on your own time, however.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extra info: Processing 30m pollinator habitat quality layers to match climate layers</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load 30m layers</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>expath <span class="ot">&lt;-</span> <span class="st">"download/extra/"</span>      <span class="co"># location of 30m layers</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>forageFall30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_fall_5km_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>forageSpring30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_spring_5km_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>forageSummer30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_summer_5km_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>nesting30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Nesting_2020_5km_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>insecticide30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Insecticide_2020_5km_STATE_FIPS_41.tif"</span>))</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Re-project -- projecting the data actually also resamples it. The default method is `bilinear`</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>forageFall <span class="ot">&lt;-</span> <span class="fu">project</span>(forageFall30m, prmean)</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>forageSpring <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSpring30m, prmean)</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>forageSummer <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSummer30m, prmean)</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>nesting <span class="ot">&lt;-</span> <span class="fu">project</span>(nesting30m, prmean)</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>insecticide <span class="ot">&lt;-</span> <span class="fu">project</span>(insecticide30m, prmean)</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Save the processed layers to your preferred location</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageFall, <span class="st">"data/forageFall.tif"</span>)</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageSpring, <span class="st">"data/forageSpring.tif"</span>)</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageSummer, <span class="st">"data/forageSummer.tif"</span>)</span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(nesting, <span class="st">"data/nesting.tif"</span>)</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(insecticide, <span class="st">"data/insecticide.tif"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extra info: Processing 30m pollinator habitat quality layers to match climate layers</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load 30m layers</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>expath <span class="ot">&lt;-</span> <span class="st">"download/extra/"</span>      <span class="co"># location of 30m layers</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>forageFall30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_fall_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>forageSpring30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_spring_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>forageSummer30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Forage_2020_summer_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>nesting30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Nesting_2020_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>insecticide30m <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(expath, <span class="st">"Insecticide_2020_5km_STATE_FIPS_41.tif"</span>))</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Re-project -- projecting the data actually also resamples it. The default method is `bilinear`</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>forageFall <span class="ot">&lt;-</span> <span class="fu">project</span>(forageFall30m, prmean)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>forageSpring <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSpring30m, prmean)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>forageSummer <span class="ot">&lt;-</span> <span class="fu">project</span>(forageSummer30m, prmean)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>nesting <span class="ot">&lt;-</span> <span class="fu">project</span>(nesting30m, prmean)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>insecticide <span class="ot">&lt;-</span> <span class="fu">project</span>(insecticide30m, prmean)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Save the processed layers to your preferred location</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageFall, <span class="st">"data/forageFall.tif"</span>)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageSpring, <span class="st">"data/forageSpring.tif"</span>)</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(forageSummer, <span class="st">"data/forageSummer.tif"</span>)</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(nesting, <span class="st">"data/nesting.tif"</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(insecticide, <span class="st">"data/insecticide.tif"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
