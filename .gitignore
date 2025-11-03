@@ -6,4 +6,4 @@
 /.quarto/
 /download/extra
 .DS_Store
-*.zip
+/*.zip
