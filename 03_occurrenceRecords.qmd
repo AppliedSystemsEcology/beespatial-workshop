@@ -46,7 +46,6 @@ GBIF_EMAIL="youremail@gbif.org"
 ```{r}
 #| message: false
 
-renv::restore()
 library(rgbif)
 
 ```
@@ -80,12 +79,25 @@ The GBIF API has specific search terms (called 'predicates' in their domain-spec
 
 ```{r predvars}
 
+# has geographic coordinates
 hasCoordinate <- TRUE
+
+# has no geospatial issues
 hasGeospatialIssue <- FALSE
+
+# acceptable geospatial coordinate accuracy: from 0 to 120 m accuracy
 coordinateUncertaintyInMeters <- "0,120"
+
+# occurrence status should be "PRESENT"
 occurrenceStatus <- "PRESENT"
+
+# time range is from 2015 to 2025
 year <- "2015,2025"
-basisOfRecord <- "OBSERVATION;HUMAN_OBSERVATION;OCCURRENCE"
+
+# type of record is human observation
+basisOfRecord <- "HUMAN_OBSERVATION"
+
+# define the geographic extent
 stateProvince <- "Oregon"
 country <- "US"
 
@@ -125,14 +137,14 @@ gbif_download <- occ_download(
   pred("occurrenceStatus", occurrenceStatus),
   pred_gte("year", 2015),
   pred_lte("year", 2025),
-  pred_in("basisOfRecord",c("OBSERVATION","HUMAN_OBSERVATION","OCCURRENCE")),
+  pred_in("basisOfRecord",basisOfRecord),
   pred("country", country),
   pred("stateProvince",stateProvince)
 )
 
 ```
 
-We can check on the status of the download using `occ_download_wait` and the code provided in the output from running `occ_download`
+We can check on the status of the download by running the download object:
 
 ```{r}
 #| eval: false
@@ -141,7 +153,7 @@ occ_download_wait(gbif_download)
 
 ```
 
-##### Example output:
+##### Example output, once the download has succeeded:
 
 ```
 <<gbif download metadata>>
@@ -155,7 +167,7 @@ occ_download_wait(gbif_download)
   Total records: 204
 ```
 
-Finally, once the download is ready, we can get the data:
+Once the download is ready, we can get the data:
 
 ```{r}
 #| eval: false
@@ -166,7 +178,12 @@ occ <- occ_download_get(gbif_download) |> occ_download_import()
 
 ```{r}
 #| echo: false
-occ <- readRDS("data/occ.rds")
+
+# If you are having trouble downloading the records because of concurrent requests,
+# you can use a pre-downloaded dataset in the download/ folder
+
+occ <- readRDS("download/occ.rds")
+
 ```
 
 # 2. Process occurence data
@@ -243,7 +260,7 @@ occ.rast <- rasterize(occ.vect |>
 
 names(occ.rast) <- "B_sitkensis"
 
-plot(occ.rast)
+plot(occ.rast, col = "blue")
 
 ```
 
