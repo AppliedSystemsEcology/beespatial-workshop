@@ -253,7 +253,7 @@ ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
 ```
 
 ::: {.callout-caution icon="false" collapse="true"}
-## Extra: Challenges of unbalanced classifcations in RF models
+## Extra: Challenges of unbalanced classifications in RF models
 
 In case you're interested, here is the output of a model that doesn't
 downsample background points to match the number of presence points.

@@ -5,8 +5,8 @@ format: html
 
 ## Overview
 
-- Retrieve occurrence records for *Bombus sitkensis* from the Global Biodiversity Information Facility (GBIF)
-- Process these records along with the environmental rasters to create presence and background points to use for fitting the species distribution model
+-   Retrieve occurrence records for *Bombus sitkensis* from the Global Biodiversity Information Facility (GBIF)
+-   Process these records along with the environmental rasters to create presence and background points to use for fitting the species distribution model
 
 # 1. Use `rgbif` to get occurrence records
 
@@ -20,7 +20,7 @@ Load the package
 library(rgbif)
 
 ```
-  
+
 ## Set up GBIF credentials
 
 To download from GBIF, you need to register and supply your registration credentials. More on this [here](https://docs.ropensci.org/rgbif/articles/gbif_credentials.html). Or you can use the account info that we've provided for this workshop.
@@ -35,20 +35,26 @@ usethis::edit_r_environ()
 
 ```
 
-This will bring up a file called **.Renviron**. Replace your own credential information below (replace the info in quotes with your info), or you can use the account info that we will provide for this workshop. Then, copy this information into the .Renviron file and save it. You must restart your R session by going to the Session tab > Restart R. 
+This will bring up a file called **.Renviron**. Replace your own credential information below (replace the info in quotes with your info), or you can use the account info that we will provide for this workshop. Then, copy this information into the .Renviron file and save it.
 
+```         
 GBIF_USER="your_username"
 
 GBIF_PWD="your_password"
 
 GBIF_EMAIL="youremail@gbif.org"
+```
+
+After changing the **.Renviron** file, you must **restart your R session** by running the code below.
 
 ```{r}
-#| message: false
+#| eval: false
 
-library(rgbif)
+.rs.restartR()
 
 ```
+
+Or, in the Rstudio menu, go to *Session \> Restart R*. If you use the menu option, make sure to reload the `rgbif` package using `library(rgbif)`.
 
 ## Get the GBIF taxon key
 
@@ -61,19 +67,19 @@ name_backbone("Bombus sitkensis")
 
 ```
 
-The taxon key for _Bombus sitkensis_ is **1340328**.
+The taxon key for *Bombus sitkensis* is **1340328**.
 
 ## Set up an `rgbif` query
 
 There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:
 
-- Has geographic coordinates
-- Has no geospatial issues
-- Has acceptable geospatial coordinate accuracy
-- Represents the presence of the target organism
-- Within a desired time range
-- Represents a human observation
-- Is within our focal geographic extent
+-   Has geographic coordinates
+-   Has no geospatial issues
+-   Has acceptable geospatial coordinate accuracy
+-   Represents the presence of the target organism
+-   Within a desired time range
+-   Represents a human observation
+-   Is within our focal geographic extent
 
 The GBIF API has specific search terms (called 'predicates' in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values
 
@@ -123,7 +129,7 @@ occ_count(
 
 ## Make the GBIF request
 
-Now that we know everything works, we make an actual request. We can use the function `occ_download()` to actually get the data. This function also returns a doi for reproducibility!
+Now that we know everything works, we make an actual request. We can use the function `occ_download()` to actually get the data.
 
 ```{r}
 #| eval: false
@@ -144,6 +150,16 @@ gbif_download <- occ_download(
 
 ```
 
+Note that the syntax is different from the `occ_search()` function. It makes use of `pred*` functions that define the filters we are defining using our search term variables from above. The first argument in is a key defining the filter, followed by the value.
+
+-   For example, `pred("taxonKey", 1340328)` filters for records with `taxonKey` 1340328, and
+
+-   `pred("hasCoordinate", hasCoordinate)` filters for records with `hasCoordinate` values equal to what we defined for the variable with the same name, above
+
+-   `pred_lte("coordinateUncertaintyInMeters",120)` and `pred_gte("coordinateUncertaintyInMeters",0)` indicate that the key `coordinateUncertaintyInMeters` should be "less than or equal to 120" and "greater than or equal to 0"
+
+-   Similarly, `pred_gte("year", 2015)` and `pred_lte("year", 2025)` indicate `year` should be \>= 2014 and \<= 2025
+
 We can check on the status of the download by running the download object:
 
 ```{r}
@@ -155,15 +171,15 @@ occ_download_wait(gbif_download)
 
 ##### Example output, once the download has succeeded:
 
-```
+```         
 <<gbif download metadata>>
   Status: SUCCEEDED
-  DOI: 10.15468/dl.jkj7fd
+  DOI: 10.15468/dl.w593th
   Format: DWCA
-  Download key: 0015030-251009101135966
-  Created: 2025-10-13T19:21:28.361+00:00
-  Modified: 2025-10-13T19:26:19.243+00:00
-  Download link: https://api.gbif.org/v1/occurrence/download/request/0015030-251009101135966.zip
+    Download key: 0013939-251025141854904
+  Created: 2025-11-03T22:09:31.716+00:00
+  Modified: 2025-11-03T22:11:28.499+00:00
+  Download link: https://api.gbif.org/v1/occurrence/download/request/0013939-251025141854904.zip
   Total records: 204
 ```
 
@@ -183,6 +199,16 @@ occ <- occ_download_get(gbif_download) |> occ_download_import()
 # you can use a pre-downloaded dataset in the download/ folder
 
 occ <- readRDS("download/occ.rds")
+
+```
+
+##### Citing the download
+
+We can get a citation with a doi, using the `gbif_citation` function and a *Download key* from the `gbif_download` object. An the example from the output above:
+
+```{r}
+
+gbif_citation("0013939-251025141854904")
 
 ```
 
@@ -231,9 +257,9 @@ names(insecticide) <- "insecticide"
 
 ```
 
-## Create occurrence grid for _Bombus sitkensis_
+## Create occurrence grid for *Bombus sitkensis*
 
-We use the coordinates of the GBIF observations to convert into georeferenced points using the `vect` function in `terra`. 
+We use the coordinates of the GBIF observations to convert into georeferenced points using the `vect` function in `terra`.
 
 ```{r}
 
@@ -266,7 +292,7 @@ plot(occ.rast, col = "blue")
 
 ### Combine presence grid with environment and habitat variables and extract to table
 
-We only need a table of presence grid cells and their associated habitat and environmental values. To do this, we can stack all the raster layers together (since they share the same projection and their grids are aligned). Then we can use the `terra` `values` function to extract the cell values of the stacked grids as rows in a table, keeping only the rows with _B. sitkensis_ presences using the `filter` function from `dplyr`.
+We only need a table of presence grid cells and their associated habitat and environmental values. To do this, we can stack all the raster layers together (since they share the same projection and their grids are aligned). Then we can use the `terra` `values` function to extract the cell values of the stacked grids as rows in a table, keeping only the rows with *B. sitkensis* presences using the `filter` function from `dplyr`.
 
 ```{r}
 #| message: false
@@ -288,8 +314,8 @@ presence <- as.data.frame(occ.envr, xy = TRUE) |>
 
 Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space available to the species of interest in the region. This means that background points:
 
-- should be numerous enough to represent the environmental variation across the region
-- may overlap with the presence points
+-   should be numerous enough to represent the environmental variation across the region
+-   may overlap with the presence points
 
 The package `predicts` has a function that is useful for creating background points, `backgroundSample`.
 

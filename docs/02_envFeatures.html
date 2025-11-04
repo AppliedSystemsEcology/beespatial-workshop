@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d07e4899fb10a1c5c27d7543a37cc619.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-b2c493fdd487b110f6b1348dfd6a5174.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -553,7 +553,15 @@ Downscaling vs.&nbsp;Interpolation
 <h2 class="anchored" data-anchor-id="download-pre-processed-habitat-quality-layers">Download pre-processed habitat quality layers</h2>
 <p>These indices have been summarized to represent the weighted average value within 5km, using an exponential decay function as you go further from a given location (the pixel center). For more information on the forage nesting data, see <a href="https://doi.org/10.1073/pnas.1517685113">Koh et al.&nbsp;(2015)</a> and for insecticide use, see <a href="https://doi.org/10.1038/s41597-022-01584-z">Douglas et al.&nbsp;(2022)</a>.</p>
 <p>Since these layers are 30m resolution, downloading them for the entire state of Oregon isn’t practical for the workshop. Instead we’ve already processed them using the same projection and resampling steps as above to match the climate data layers.</p>
-<p>These layers are already in the <code>data/</code> folder in your workspace. You can also download the pre-processed layers <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/data/habitatquality.zip"><strong>here</strong></a>.</p>
+<p>These layers are already in the <code>data/</code> folder in your workspace.</p>
+<ul>
+<li><p><code>data/forageFall.tif</code></p></li>
+<li><p><code>data/forageSpring.tif</code></p></li>
+<li><p><code>data/forageSummer.tif</code></p></li>
+<li><p><code>data/insecticide.tif</code></p></li>
+<li><p><code>data/nesting.tif</code></p></li>
+</ul>
+<p>You can also download the pre-processed layers <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/download/habitatquality.zip"><strong>here</strong></a>.</p>
 <div class="callout callout-style-default callout-caution no-icon callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
