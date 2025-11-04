@@ -296,7 +296,19 @@ These indices have been summarized to represent the weighted average value withi
 
 Since these layers are 30m resolution, downloading them for the entire state of Oregon isn't practical for the workshop. Instead we've already processed them using the same projection and resampling steps as above to match the climate data layers.
 
-These layers are already in the `data/` folder in your workspace. You can also download the pre-processed layers [**here**](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/data/habitatquality.zip).
+These layers are already in the `data/` folder in your workspace.
+
+-   `data/forageFall.tif`
+
+-   `data/forageSpring.tif`
+
+-   `data/forageSummer.tif`
+
+-   `data/insecticide.tif`
+
+-   `data/nesting.tif`
+
+You can also download the pre-processed layers [**here**](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/download/habitatquality.zip).
 
 ::: {.callout-caution icon="false" collapse="true"}
 ## Extra: Pre-processing steps
