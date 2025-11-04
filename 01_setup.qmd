@@ -5,28 +5,22 @@ format: html
 
 # Setup
 
-  - Install packages/setup environment
-  - Where to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE
-  - Downloading/cloning the github repo
-
-## `renv`
-
-For this workshop we will use the `renv` package to create a reproducible R environment. To initialize the environment first install the `renv` package.
+The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren't currently installed, it may take several minutes.
 
 ```{r}
-#| eval: false
-if (!require("renv")) {
-  install.packages("renv")
+load_pkgs <- function(pkgs) {
+  inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
+  for(p in inst_pkgs) install.packages(p, ask = FALSE)
+  sapply(pkgs,require,character=TRUE)
 }
 
-library(renv)
+pkgs <- c("terra", "rlandfire", "rgbif",
+          "dplyr", "predicts", "tidymodels",
+          "sf", "ggplot2", "themis", "pROC",
+          "ecospat", "ranger", "usethis", 
+          "rmarkdown")
 
+load_pkgs(pkgs)
 ```
 
-Then run `renv::restore()` to install all of the packages we will use in this workshop.
-
-```{r}
-
-renv::restore()
-
-```
+If you have not previously installed spatial packages in R (e.g., `terra`) you may encounter an error. The most common issue is a result of not having `gdal` installed. If you encounter an error, any of the workshop organizers can help you troubleshoot.
