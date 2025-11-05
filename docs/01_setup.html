@@ -180,7 +180,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a>
+  <ul class="collapse">
+  <li><a href="#download-workshop-code-and-data-from-the-repository" id="toc-download-workshop-code-and-data-from-the-repository" class="nav-link" data-scroll-target="#download-workshop-code-and-data-from-the-repository">Download workshop code and data from the repository</a></li>
+  <li><a href="#install-packages" id="toc-install-packages" class="nav-link" data-scroll-target="#install-packages">Install packages</a>
+  <ul class="collapse">
+  <li><a href="#tips-for-installing-gdal" id="toc-tips-for-installing-gdal" class="nav-link" data-scroll-target="#tips-for-installing-gdal">Tips for installing <code>gdal</code></a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -208,6 +215,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="setup" class="level1">
 <h1>Setup</h1>
+<section id="download-workshop-code-and-data-from-the-repository" class="level2">
+<h2 class="anchored" data-anchor-id="download-workshop-code-and-data-from-the-repository">Download workshop code and data from the repository</h2>
+<p>To follow along with the workshop on your own computer, you will need to download the contents from the <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop">workshop repository</a>, click on the green <strong>&lt;&gt;Code</strong> button and select <strong>Download ZIP</strong>. Unzip the downloaded zip file and save the folder to your computer.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="media/downloadcode.png" class="img-fluid figure-img" width="300"></p>
+<figcaption><strong>Code</strong> menu in the upper right corner of the <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop">workshop repository</a></figcaption>
+</figure>
+</div>
+</section>
+<section id="install-packages" class="level2">
+<h2 class="anchored" data-anchor-id="install-packages">Install packages</h2>
 <p>The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren’t currently installed, it may take several minutes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>load_pkgs <span class="ot">&lt;-</span> <span class="cf">function</span>(pkgs) {</span>
@@ -223,123 +242,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">"rmarkdown"</span>)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">load_pkgs</span>(pkgs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: terra</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>terra 1.8.60</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: rlandfire</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>[38;5;208m                           
-         _           _ ___ _         
-     ___| |___ ___ _| |  _|_|___ ___ 
-    |  _| | .'|   | . |  _| |  _| -_|
-    |_| |_|__,|_|_|___|_| |_|_| |___|
-                                 
-    [0mversion:2.0.1[38;5;160m
-
-NOTICE:[0m
-The LFPS API has been updated (LFPSv1 -&gt; LFPSv2) and has new requirements.
-To review the required parameters and syntax for LFPSv2 view `?rlandfire::landfireAPIv2`
-Product names and availability may have changed, check `viewProducts()`
-
-[38;5;160mWorkflows built before May 2025 or with `rlandfire` versions &lt; 2.0.0 will need to be updated.[0m</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: rgbif</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: dplyr</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:terra':
-
-    intersect, union</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: predicts</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: tidymodels</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.4.1 ──</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>✔ broom        1.0.10     ✔ rsample      1.3.1 
-✔ dials        1.4.2      ✔ tailor       0.1.0 
-✔ ggplot2      4.0.0      ✔ tidyr        1.3.1 
-✔ infer        1.0.9      ✔ tune         2.0.1 
-✔ modeldata    1.5.1      ✔ workflows    1.3.0 
-✔ parsnip      1.3.3      ✔ workflowsets 1.1.1 
-✔ purrr        1.1.0      ✔ yardstick    1.3.2 
-✔ recipes      1.3.1      </code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
-✖ dials::buffer()         masks terra::buffer()
-✖ purrr::discard()        masks scales::discard()
-✖ tidyr::extract()        masks terra::extract()
-✖ dplyr::filter()         masks stats::filter()
-✖ dplyr::lag()            masks stats::lag()
-✖ .GlobalEnv::load_pkgs() masks tune::load_pkgs()
-✖ recipes::step()         masks stats::step()
-✖ dials::threshold()      masks predicts::threshold()
-✖ recipes::update()       masks terra::update(), stats::update()</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: sf</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: themis</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: pROC</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Type 'citation("pROC")' for a citation.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'pROC'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    cov, smooth, var</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: ecospat</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: ranger</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: usethis</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: rmarkdown</code></pre>
-</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     terra  rlandfire      rgbif      dplyr   predicts tidymodels         sf 
       TRUE       TRUE       TRUE       TRUE       TRUE       TRUE       TRUE 
@@ -348,8 +250,22 @@ Attaching package: 'pROC'</code></pre>
 </div>
 </div>
 <p>If you have not previously installed spatial packages in R (e.g., <code>terra</code>) you may encounter an error. The most common issue is a result of not having <code>gdal</code> installed. If you encounter an error, any of the workshop organizers can help you troubleshoot.</p>
+<section id="tips-for-installing-gdal" class="level3">
+<h3 class="anchored" data-anchor-id="tips-for-installing-gdal">Tips for installing <code>gdal</code></h3>
+<p>Mac and Linux computers may need extra steps to install <code>gdal</code>, a necessary geoprocessing library.</p>
+<section id="mac" class="level4">
+<h4 class="anchored" data-anchor-id="mac">Mac</h4>
+<p>If you are using a Mac and don’t have <code>gdal</code> installed, follow <a href="https://github.com/rspatial/terra?tab=readme-ov-file#macos">these directions</a>.</p>
+<p>You may need to install <a href="https://brew.sh/">homebrew</a> first.</p>
+</section>
+<section id="linux" class="level4">
+<h4 class="anchored" data-anchor-id="linux">Linux</h4>
+<p>To install <code>gdal</code> on Linux, follow <a href="https://github.com/rspatial/terra?tab=readme-ov-file#linux">these directions</a>.</p>
 
 
+</section>
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->

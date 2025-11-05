@@ -251,10 +251,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>These resources take two different approaches to serving data, as you’ll see.</p>
 <section id="beespatial" class="level2">
-<h2 class="anchored" data-anchor-id="beespatial">BeeSpatial</h2>
+<h2 class="anchored" data-anchor-id="beespatial"><a href="https://beesuite.psu.edu/beespatial/">BeeSpatial</a></h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you’re having trouble accessing layers from BeeSpatial or <code>rlandfire</code>, they can also be downloaded directly from <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip">here</a>.</p>
+</div>
+</div>
 <section id="download-beespatial-data" class="level3">
 <h3 class="anchored" data-anchor-id="download-beespatial-data">Download BeeSpatial data</h3>
-<p>BeeSpatial has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the <strong>Select geographic boundaries</strong> option in the <strong>Select locations</strong> step.</p>
+<p><a href="https://beesuite.psu.edu/beespatial/">BeeSpatial</a> has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the <strong>Select geographic boundaries</strong> option in the <strong>Select locations</strong> step.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="media/beespatial_loc.jpg" class="img-fluid figure-img"></p>
+<figcaption><a href="https://beesuite.psu.edu/beespatial/">BeeSpatial</a> interface. Preparing to download statewide rasters for Oregon.</figcaption>
+</figure>
+</div>
+<p>For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:</p>
+<ul>
+<li>Monthly maximum and minimum temperatures for 2020</li>
+<li>Monthly total precipitation for 2020</li>
+</ul>
+<p>We will also be getting pollinator habitat layers from BeeSpatial – more on this later.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -268,18 +293,6 @@ Note
 <p>See the <a href="https://climateecology.github.io/beespatial-tutorial/">BeeSpatial tutorial</a> for more information about this tool.</p>
 </div>
 </div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="media/beespatial_loc.jpg" class="img-fluid figure-img"></p>
-<figcaption>BeeSpatial interface. Preparing to download statewide rasters for Oregon.</figcaption>
-</figure>
-</div>
-<p>For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:</p>
-<ul>
-<li>Monthly maximum and minimum temperatures for 2020</li>
-<li>Monthly total precipitation for 2020</li>
-</ul>
-<p>We will also be getting pollinator habitat layers from BeeSpatial – more on this later.</p>
 </section>
 <section id="load-the-downloaded-data" class="level3">
 <h3 class="anchored" data-anchor-id="load-the-downloaded-data">Load the downloaded data</h3>
@@ -335,6 +348,19 @@ max values  : 1453.62988, 779.6107, 321.533447, 327.014679, 455.98788, 2.770888e
 </section>
 <section id="rlandfire" class="level2">
 <h2 class="anchored" data-anchor-id="rlandfire"><code>rlandfire</code></h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you’re having trouble accessing layers from BeeSpatial or <code>rlandfire</code>, they can also be downloaded directly from <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip">here</a>.</p>
+</div>
+</div>
 <section id="download-rlandfire-data" class="level3">
 <h3 class="anchored" data-anchor-id="download-rlandfire-data">Download <code>rlandfire</code> data</h3>
 <p>We will use <code>rlandfire</code> to get additional landscape data:</p>
@@ -503,7 +529,7 @@ Note
 <h3 class="anchored" data-anchor-id="resample">Resample</h3>
 <p>To make these layers’ resolution match and their pixels align, we will use <strong>resampling</strong>. This means transferring the raster data to a new pixel grid. We will do this by matching the <code>elev</code> and <code>cc</code> rasters to that of the climate datasets. To translate the data to the new grid, we will use <strong>bilinear interpolation</strong>, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.</p>
 <div class="callout callout-style-default callout-caution no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -512,7 +538,7 @@ Downscaling vs.&nbsp;Interpolation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>It is worth noting that simple interpolation methods (like bilinear interpolation) only smooth the existing data and they do not add new information or detail to the original course resolution data. For example, if you had 4km weather data and wanted to perform modeling at 1km, resampling with any of the simple interpolation methods would allow you to model at a finer resolution, but the underlying information would still, effectively, be at a 4km resolution. Instead, you would need to use statistical downscaling, dynamic downscaling, or a purpose build machine learning algorithm.</p>
 </div>
@@ -561,9 +587,8 @@ Downscaling vs.&nbsp;Interpolation
 <li><p><code>data/insecticide.tif</code></p></li>
 <li><p><code>data/nesting.tif</code></p></li>
 </ul>
-<p>You can also download the pre-processed layers <a href="https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/download/habitatquality.zip"><strong>here</strong></a>.</p>
 <div class="callout callout-style-default callout-caution no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -572,7 +597,7 @@ Extra: Pre-processing steps
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>In case you’re interested, the code for the pre-processing is below. You will need to download the corresponding layers from BeeSpatial on your own time, however.</p>
 <div class="cell">
