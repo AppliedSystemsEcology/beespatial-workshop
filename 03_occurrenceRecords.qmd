@@ -212,7 +212,7 @@ gbif_citation("0013939-251025141854904")
 
 ```
 
-# 2. Process occurence data
+# 2. Process occurrence data
 
 ## Load environmental and habitat rasters
 

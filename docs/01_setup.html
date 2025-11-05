@@ -180,10 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a>
-  <ul class="collapse">
-  <li><a href="#renv" id="toc-renv" class="nav-link" data-scroll-target="#renv"><code>renv</code></a></li>
-  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
   </ul>
 </nav>
     </div>
@@ -211,31 +208,148 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="setup" class="level1">
 <h1>Setup</h1>
-<ul>
-<li>Install packages/setup environment</li>
-<li>Where to find data if there are issues w/ BeeSpatial, GBIF, LANDFIRE</li>
-<li>Downloading/cloning the github repo</li>
-</ul>
-<section id="renv" class="level2">
-<h2 class="anchored" data-anchor-id="renv"><code>renv</code></h2>
-<p>For this workshop we will use the <code>renv</code> package to create a reproducible R environment. To initialize the environment first install the <code>renv</code> package.</p>
+<p>The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren’t currently installed, it may take several minutes.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"renv"</span>)) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">"renv"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(renv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>load_pkgs <span class="ot">&lt;-</span> <span class="cf">function</span>(pkgs) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  inst_pkgs <span class="ot">&lt;-</span> pkgs[<span class="sc">!</span>pkgs <span class="sc">%in%</span> <span class="fu">installed.packages</span>()]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(p <span class="cf">in</span> inst_pkgs) <span class="fu">install.packages</span>(p, <span class="at">ask =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(pkgs,require,<span class="at">character=</span><span class="cn">TRUE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"terra"</span>, <span class="st">"rlandfire"</span>, <span class="st">"rgbif"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">"dplyr"</span>, <span class="st">"predicts"</span>, <span class="st">"tidymodels"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">"sf"</span>, <span class="st">"ggplot2"</span>, <span class="st">"themis"</span>, <span class="st">"pROC"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">"ecospat"</span>, <span class="st">"ranger"</span>, <span class="st">"usethis"</span>, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">"rmarkdown"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">load_pkgs</span>(pkgs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: terra</code></pre>
 </div>
-<p>Then run <code>renv::restore()</code> to install all of the packages we will use in this workshop.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>terra 1.8.60</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: rlandfire</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[38;5;208m                           
+         _           _ ___ _         
+     ___| |___ ___ _| |  _|_|___ ___ 
+    |  _| | .'|   | . |  _| |  _| -_|
+    |_| |_|__,|_|_|___|_| |_|_| |___|
+                                 
+    [0mversion:2.0.1[38;5;160m
+
+NOTICE:[0m
+The LFPS API has been updated (LFPSv1 -&gt; LFPSv2) and has new requirements.
+To review the required parameters and syntax for LFPSv2 view `?rlandfire::landfireAPIv2`
+Product names and availability may have changed, check `viewProducts()`
+
+[38;5;160mWorkflows built before May 2025 or with `rlandfire` versions &lt; 2.0.0 will need to be updated.[0m</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: rgbif</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: dplyr</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:terra':
+
+    intersect, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: predicts</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: tidymodels</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.4.1 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ broom        1.0.10     ✔ rsample      1.3.1 
+✔ dials        1.4.2      ✔ tailor       0.1.0 
+✔ ggplot2      4.0.0      ✔ tidyr        1.3.1 
+✔ infer        1.0.9      ✔ tune         2.0.1 
+✔ modeldata    1.5.1      ✔ workflows    1.3.0 
+✔ parsnip      1.3.3      ✔ workflowsets 1.1.1 
+✔ purrr        1.1.0      ✔ yardstick    1.3.2 
+✔ recipes      1.3.1      </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ dials::buffer()         masks terra::buffer()
+✖ purrr::discard()        masks scales::discard()
+✖ tidyr::extract()        masks terra::extract()
+✖ dplyr::filter()         masks stats::filter()
+✖ dplyr::lag()            masks stats::lag()
+✖ .GlobalEnv::load_pkgs() masks tune::load_pkgs()
+✖ recipes::step()         masks stats::step()
+✖ dials::threshold()      masks predicts::threshold()
+✖ recipes::update()       masks terra::update(), stats::update()</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sf</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: themis</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: pROC</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Type 'citation("pROC")' for a citation.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'pROC'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    cov, smooth, var</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ecospat</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ranger</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: usethis</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: rmarkdown</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>- The library is already synchronized with the lockfile.</code></pre>
+<pre><code>     terra  rlandfire      rgbif      dplyr   predicts tidymodels         sf 
+      TRUE       TRUE       TRUE       TRUE       TRUE       TRUE       TRUE 
+   ggplot2     themis       pROC    ecospat     ranger    usethis  rmarkdown 
+      TRUE       TRUE       TRUE       TRUE       TRUE       TRUE       TRUE </code></pre>
 </div>
 </div>
+<p>If you have not previously installed spatial packages in R (e.g., <code>terra</code>) you may encounter an error. The most common issue is a result of not having <code>gdal</code> installed. If you encounter an error, any of the workshop organizers can help you troubleshoot.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
