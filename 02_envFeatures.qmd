@@ -21,13 +21,14 @@ These resources take two different approaches to serving data, as you'll see.
 
 ## [BeeSpatial](https://beesuite.psu.edu/beespatial/)
 
+::: {.callout-tip}
+### Tip
+If you're having trouble accessing layers from BeeSpatial or `rlandfire`, they can also be downloaded directly from [here](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip).
+:::
+
 ### Download BeeSpatial data
 
 [BeeSpatial](https://beesuite.psu.edu/beespatial/) has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step.
-
-::: callout-note
-See the [BeeSpatial tutorial](https://climateecology.github.io/beespatial-tutorial/) for more information about this tool.
-:::
 
 ![[BeeSpatial](https://beesuite.psu.edu/beespatial/) interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
 
@@ -37,6 +38,10 @@ For this workshop, we will need the following statewide layers, for Oregon, from
 -   Monthly total precipitation for 2020
 
 We will also be getting pollinator habitat layers from BeeSpatial -- more on this later.
+
+::: callout-note
+See the [BeeSpatial tutorial](https://climateecology.github.io/beespatial-tutorial/) for more information about this tool.
+:::
 
 ### Load the downloaded data
 
@@ -80,6 +85,11 @@ pr
 Now looking at the attributes of the climate data, we see that the resolution value is much larger (`3658.236, 3658.236  (x, y)`). This is because they are now in units of meters. Each pixel of this raster has resolution of roughly 4km. We will use this as a template for the LANDFIRE data layers, since this is our coarsest resolution layer.
 
 ## `rlandfire`
+
+::: {.callout-tip}
+### Tip
+If you're having trouble accessing layers from BeeSpatial or `rlandfire`, they can also be downloaded directly from [here](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip).
+:::
 
 ### Download `rlandfire` data
 
@@ -307,8 +317,6 @@ These layers are already in the `data/` folder in your workspace.
 -   `data/insecticide.tif`
 
 -   `data/nesting.tif`
-
-You can also download the pre-processed layers [**here**](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/main/download/habitatquality.zip).
 
 ::: {.callout-caution icon="false" collapse="true"}
 ## Extra: Pre-processing steps

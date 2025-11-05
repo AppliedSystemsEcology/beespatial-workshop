@@ -16,7 +16,7 @@ To follow along with the workshop on your own computer, you will need to downloa
 The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren't currently installed, it may take several minutes.
 
 ```{r}
-#| results: false
+#| message: false
 
 load_pkgs <- function(pkgs) {
   inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
