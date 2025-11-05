@@ -7,18 +7,3 @@ To follow along with the workshop on your own computer, you will need to downloa
 <img src="media/downloadcode.png?raw=true"
 style="width:50.0%" />
 
-### Install/Load Packages
-
-```         
-load_pkgs <- function(pkgs) {
-  inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
-  for(p in inst_pkgs) install.packages(p)
-  sapply(pkgs,require,character=TRUE)
-}
-
-pkgs <- c("terra", "rlandfire", "rgbif",
-          "dplyr", "predicts", "tidymodels",
-          "sf", "ggplot2", "themis", "pROC",
-          "ecospat")
-load_pkgs(pkgs)
-```

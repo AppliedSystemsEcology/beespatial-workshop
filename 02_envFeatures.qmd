@@ -19,17 +19,17 @@ We'll be downloading data using two different resources that serve landscape dat
 
 These resources take two different approaches to serving data, as you'll see.
 
-## BeeSpatial
+## [BeeSpatial](https://beesuite.psu.edu/beespatial/)
 
 ### Download BeeSpatial data
 
-BeeSpatial has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step.
+[BeeSpatial](https://beesuite.psu.edu/beespatial/) has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step.
 
 ::: callout-note
 See the [BeeSpatial tutorial](https://climateecology.github.io/beespatial-tutorial/) for more information about this tool.
 :::
 
-![BeeSpatial interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
+![[BeeSpatial](https://beesuite.psu.edu/beespatial/) interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
 
 For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
 

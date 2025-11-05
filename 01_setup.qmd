@@ -5,9 +5,19 @@ format: html
 
 # Setup
 
+## Download workshop code and data from the repository
+
+To follow along with the workshop on your own computer, you will need to download the contents from the [workshop repository](https://github.com/AppliedSystemsEcology/beespatial-workshop), click on the green **\<\>Code** button and select **Download ZIP**. Unzip the downloaded zip file and save the folder to your computer.
+
+![**Code** menu in the upper right corner of the [workshop repository](https://github.com/AppliedSystemsEcology/beespatial-workshop)](media/downloadcode.png){width="300"}
+
+## Install packages
+
 The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren't currently installed, it may take several minutes.
 
 ```{r}
+#| results: false
+
 load_pkgs <- function(pkgs) {
   inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
   for(p in inst_pkgs) install.packages(p, ask = FALSE)
@@ -24,3 +34,17 @@ load_pkgs(pkgs)
 ```
 
 If you have not previously installed spatial packages in R (e.g., `terra`) you may encounter an error. The most common issue is a result of not having `gdal` installed. If you encounter an error, any of the workshop organizers can help you troubleshoot.
+
+### Tips for installing `gdal`
+
+Mac and Linux computers may need extra steps to install `gdal`, a necessary geoprocessing library.
+
+#### Mac
+
+If you are using a Mac and don't have `gdal` installed, follow [these directions](https://github.com/rspatial/terra?tab=readme-ov-file#macos).
+
+You may need to install [homebrew](https://brew.sh/) first.
+
+#### Linux
+
+To install `gdal` on Linux, follow [these directions](https://github.com/rspatial/terra?tab=readme-ov-file#linux).
