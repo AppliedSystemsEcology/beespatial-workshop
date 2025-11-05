@@ -5,5 +5,16 @@
 
 /.quarto/
 /download/extra
+/Oregon_raster_data
 .DS_Store
 /*.zip
+
+/data/elevcc.tif
+/data/occ.envr.rds
+/data/presback.rds
+/data/prmean.tif
+/data/sdm_rast.tif
+/data/tmax_yr.tif
+/data/tmean_yr.tif
+/data/tmin_yr.tif
+
