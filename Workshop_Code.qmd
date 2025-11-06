@@ -1,0 +1,1052 @@
+---
+title: "EcoSpatial Workshop Code Document"
+format: html
+editor: visual
+---
+
+# 1.0 Setup
+
+## Download workshop code and data from the repository
+
+To follow along with the workshop on your own computer, you will need to download the contents from the [workshop repository](https://github.com/AppliedSystemsEcology/beespatial-workshop), click on the green **\<\>Code** button and select **Download ZIP**. Unzip the downloaded zip file and save the folder to your computer.
+
+![**Code** menu in the upper right corner of the [workshop repository](https://github.com/AppliedSystemsEcology/beespatial-workshop)](media/downloadcode.png){width="300"}
+
+## Install packages
+
+The following function installs and loads all the packages required for this workshop. While this function only installs packages that aren't currently installed, it may take several minutes.
+
+```{r}
+#| message: false
+
+load_pkgs <- function(pkgs) {
+  inst_pkgs <- pkgs[!pkgs %in% installed.packages()]
+  for(p in inst_pkgs) install.packages(p, ask = FALSE)
+  sapply(pkgs,require,character=TRUE)
+}
+
+pkgs <- c("terra", "rlandfire", "rgbif",
+          "dplyr", "predicts", "tidymodels",
+          "sf", "ggplot2", "themis", "pROC",
+          "ecospat", "ranger", "usethis", 
+          "rmarkdown")
+
+load_pkgs(pkgs)
+```
+
+If you have not previously installed spatial packages in R (e.g., `terra`) you may encounter an error. The most common issue is a result of not having `gdal` installed. If you encounter an error, any of the workshop organizers can help you troubleshoot.
+
+### Tips for installing `gdal`
+
+Mac and Linux computers may need extra steps to install `gdal`, a necessary geoprocessing library.
+
+#### Mac
+
+If you are using a Mac and don't have `gdal` installed, follow [these directions](https://github.com/rspatial/terra?tab=readme-ov-file#macos).
+
+You may need to install [homebrew](https://brew.sh/) first.
+
+#### Linux
+
+To install `gdal` on Linux, follow [these directions](https://github.com/rspatial/terra?tab=readme-ov-file#linux).
+
+# 2.0 Study Area and Environmental Features
+
+## Overview
+
+-   Identify some landscape online data resources that can be used for insect distribution mapping
+
+-   Load GIS data layers into R and clean and visualize them in preparation for modeling
+
+### 2.1 Landscape data resources
+
+We'll be downloading data using two different resources that serve landscape data to researchers:
+
+-   [BeeSpatial](https://beesuite.psu.edu/beespatial/) - A portal to access research data layers and summaries that extends the information presented on the [Beescape app](https://beescape.psu.edu/)
+
+-   [`rlandfire`](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) - an R package that provides access to a diverse suite of spatial data layers from [LANDFIRE](https://landfire.gov/), that provides data layers for wildfire management, fuel modeling, ecology, natural resource management, climate, conservation, etc.
+
+These resources take two different approaches to serving data, as you'll see.
+
+## [BeeSpatial](https://beesuite.psu.edu/beespatial/)
+
+::: callout-tip
+#### Tip
+
+If you're having trouble accessing layers from BeeSpatial or `rlandfire`, they can also be downloaded directly from [here](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip).
+:::
+
+#### Download BeeSpatial data
+
+[BeeSpatial](https://beesuite.psu.edu/beespatial/) has a point-and-click graphical user interface. You can use it to download raster layers for climate, nesting habitat, and seasonal floral resources. Statewide rasters for these layers can be selected using the **Select geographic boundaries** option in the **Select locations** step.
+
+![[BeeSpatial](https://beesuite.psu.edu/beespatial/) interface. Preparing to download statewide rasters for Oregon.](media/beespatial_loc.jpg)
+
+For this workshop, we will need the following statewide layers, for Oregon, from BeeSpatial:
+
+-   Monthly maximum and minimum temperatures for 2020
+-   Monthly total precipitation for 2020
+
+We will also be getting pollinator habitat layers from BeeSpatial -- more on this later.
+
+::: callout-note
+See the [BeeSpatial tutorial](https://climateecology.github.io/beespatial-tutorial/) for more information about this tool.
+:::
+
+#### Load the downloaded data
+
+```{r}
+#| message: false
+
+library(terra)
+
+downloadpath <- "download/Oregon_raster_data/"   # change to your download location
+
+tmin <- rast(paste0(downloadpath,"tmin_2020_STATE_FIPS_41.tif"))
+tmax <- rast(paste0(downloadpath,"tmax_2020_STATE_FIPS_41.tif"))
+pr <- rast(paste0(downloadpath, "pr_2020_STATE_FIPS_41.tif"))
+
+```
+
+If we take a look at one of the downloaded climate datasets:
+
+```{r}
+
+pr
+
+```
+
+Notice that the downloaded climate data is in geographic coordinates, which is designed for a sphere and uses angles to indicate location and distance. Note that the resolution of each pixel is `0.04166667, 0.04166667  (x, y)`. These values are in units of degrees. We want to change this to a projected coordinate system, which represents consistent units on the ground and matches with the LANDFIRE data.
+
+#### Change the projection
+
+We're going to use the [Universal Transverse Mercator (UTM) zone 10N projection](https://epsg.io/32610), which works well for the state of Oregon.
+
+```{r}
+
+tmin <- terra::project(tmin, "epsg:32610")   # 32610 indicates the EPSG code for UTM 10N
+tmax <- terra::project(tmax, "epsg:32610") 
+pr <- terra::project(pr, "epsg:32610")
+
+pr
+
+```
+
+Now looking at the attributes of the climate data, we see that the resolution value is much larger (`3658.236, 3658.236  (x, y)`). This is because they are now in units of meters. Each pixel of this raster has resolution of roughly 4km. We will use this as a template for the LANDFIRE data layers, since this is our coarsest resolution layer.
+
+### `rlandfire`
+
+::: callout-tip
+#### Tip
+
+If you're having trouble accessing layers from BeeSpatial or `rlandfire`, they can also be downloaded directly from [here](https://github.com/AppliedSystemsEcology/beespatial-workshop/raw/refs/heads/website/download/Oregon_raster_data.zip).
+:::
+
+#### Download `rlandfire` data
+
+We will use `rlandfire` to get additional landscape data:
+
+-   Elevation
+-   Canopy cover
+
+As a first step, load the package and use one of the climate layers (loaded in the previous step) to determine the area of interest (AOI) that we will use to get the LANDFIRE data. We can use the `rlandfire` function `getAOI` to do this.
+
+```{r}
+#| warning: false
+#| message: false
+
+library(rlandfire)
+
+aoi <- getAOI(tmin)
+aoi
+
+```
+
+The AOI is specified in geographic coordinates, with is what is required by the LANDFIRE API that `rlandfire` is talking to.
+
+To request layers with `rlandfire` we have to specify the LANDFIRE products using their abbreviated names. The layers can be viewed [here](https://lfps.usgs.gov/products), which is also accessible using the package function `rlandfire::viewProducts()`. We will be selecting the elevation layer:
+
+-   `ELEV2020` = 2020 elevation
+-   `200CC_20` = canopy cover
+
+```{r}
+#| eval: false
+
+products <- c("ELEV2020", "200CC_20")
+
+# additional parameters
+email <- "youremail@example.com"               # Replace with your email
+lfpath <- paste0(getwd(),"/download/lf.zip")   # change to your FULL download path
+projection <- 32610                            # UTM 10N
+resolution <- res(tmin)[1]                     # match climate data resolution
+
+elevcc <- landfireAPIv2(products = products,
+                    aoi = aoi, 
+                    projection = projection,
+                    resolution = resolution,
+                    email = email,
+                    path = lfpath,
+                    verbose = FALSE) %>%
+          landfireVSI()                        # Reads the LANDFIRE data without
+                                               # needing to unzip the directory
+plot(elevcc)
+```
+
+::: callout-note
+See the [`rlandfire` tutorial](https://cran.r-project.org/web/packages/rlandfire/vignettes/rlandfire.html) for more background about these steps.
+:::
+
+## 2.2 Data aggregation and cleaning
+
+We need to prepare these data layers for analysis. This means:
+
+1.  We need the layers to represent the desired inputs of our species distribution model.\
+2.  We need the pixels of each layer to match with the corresponding pixels in the other layers.
+
+### Prepare model inputs
+
+For our species distribution model, we are planning to use **mean precipitation**, **mean temperature**, and **elevation** as inputs. We already have elevation.
+
+Let's look at the climate data from BeeSpatial. This data originates from the [PRISM group](https://prism.oregonstate.edu/), which produces weather raster layers from climate station data.
+
+```{r}
+#| fig-cap: Contents of the minimum temperature raster.
+
+plot(tmin)
+
+```
+
+As you can see, this data is comprised of 12 layers. Each layer represents the minimum temperature for the month indicated by the last two digits of the layer name, e.g., May of 2020: "tmin202005". What we want, however, is the mean temperature over the whole year. To get this, we will perform some aggregation.
+
+#### Data aggregation: Calculate annual mean temperature
+
+To get a mean annual temperature raster, we will combine the monthly min (**tmin**) and max (**tmax**) temperature layers in this way:
+
+1.  Average **tmin** and **tmax** pixels for each month to get a monthly mean --\> **tmean_mon**
+2.  Average monthly means across the year to get the average temperature for the year --\> \*tmean_yr\*\*
+
+##### Calculate monthly mean temperature `tmean_mon`
+
+We can calculate the monthly average for each month by simply adding the **tmin** and **tmax** rasters and dividing by two. This is possible because these rasters' layers match so that the first layer (January) of **tmin** is added to the first layer of **tmax** and divided by two, etc.
+
+```{r}
+#| fig-cap: Calculated mean monthly temperature. The layer names are inherited from tmin.
+
+tmean_mon <- (tmin + tmax)/2
+
+plot(tmean_mon)
+```
+
+##### Calculate annual mean temperature `tmean_yr`
+
+We simply use `mean()` to calculate the mean across month layers in the **tmean_mon** raster.
+
+```{r}
+#| fig-cap: Calculated mean annual temperature.
+
+tmin_yr  <- min(tmin)
+tmax_yr  <- min(tmax)
+tmean_yr <- mean(tmean_mon)
+
+plot(tmean_yr)
+
+```
+
+#### Data aggregation: Calculate mean annual precipitation `prmean`
+
+Calculating the mean annual precipitation (`prmean`) uses the same approach as calculating the mean annual temperature from monthly means.
+
+```{r}
+
+prmean <- mean(pr)
+
+```
+
+### Make model input layers align
+
+To overlay these raster day from different sources, we need to check if they have the same **projection**, **resolution**, and **alignment**.
+
+Check if the climate data and LANDFIRE data have the same projection. We're only checking `prmean` and `elev`, but you can use the same code to check the other layers.
+
+```{r}
+
+same.crs(crs(prmean), crs(elevcc))
+
+```
+
+We expected the projection to be the same because we requested a specific projection in `rlandfire`.
+
+Check if the resolution is the same.
+
+```{r}
+
+all.equal(res(prmean), res(elevcc))
+
+```
+
+It looks like there's a small difference resolution. If you compare the actual values of the climate data (`res(prmean)`) and elevation (`res(elev)`), it looks like the LANDFIRE layer only matches the climate layer resolution to the nearest whole number. This means that these layers also don't align over their extents.
+
+#### Resample
+
+To make these layers' resolution match and their pixels align, we will use **resampling**. This means transferring the raster data to a new pixel grid. We will do this by matching the `elev` and `cc` rasters to that of the climate datasets. To translate the data to the new grid, we will use **bilinear interpolation**, which takes into account the neighboring cell values for a 3x3 cell window. Be aware that there are other choices that could be made here depending on the type of data we are resampling.
+
+::: {.callout-caution icon="false" collapse="true"}
+#### Downscaling vs. Interpolation
+
+It is worth noting that simple interpolation methods (like bilinear interpolation) only smooth the existing data and they do not add new information or detail to the original course resolution data. For example, if you had 4km weather data and wanted to perform modeling at 1km, resampling with any of the simple interpolation methods would allow you to model at a finer resolution, but the underlying information would still, effectively, be at a 4km resolution. Instead, you would need to use statistical downscaling, dynamic downscaling, or a purpose build machine learning algorithm.
+:::
+
+```{r}
+
+elevcc2 <- resample(elevcc,              # layer to be resampled
+                    prmean,              # target grid to base resampling on
+                    method = "bilinear"  # method is bilinear interpolation
+                    )
+
+```
+
+Now we can check if these layers share the same resolution:
+
+```{r}
+
+all.equal(res(prmean), res(elevcc2))
+
+```
+
+And if their extents are the same:
+
+```{r}
+
+all.equal(ext(prmean), ext(elevcc2))
+
+```
+
+```{r}
+#| echo: false
+#| eval: false
+
+writeRaster(prmean, "data/prmean.tif")
+writeRaster(tmean_yr, "data/tmean_yr.tif")
+writeRaster(tmean_yr, "data/tmax_yr.tif")
+writeRaster(tmean_yr, "data/tmin_yr.tif")
+writeRaster(elevcc2, "data/elevcc.tif")
+
+```
+
+## 2.3 Pollinator habitat quality layers
+
+We can get some additional habitat quality layers from BeeSpatial:
+
+-   Seasonal pollinator forage (spring, summer, and fall)
+-   Pollinator nesting habitat (ground, stem, cavity, and wood-nesting species sites)
+-   Potential insecticide use based on typical practices in the state (in 2014)
+
+### Download pre-processed habitat quality layers
+
+These indices have been summarized to represent the weighted average value within 5km, using an exponential decay function as you go further from a given location (the pixel center). For more information on the forage nesting data, see [Koh et al. (2015)](https://doi.org/10.1073/pnas.1517685113) and for insecticide use, see [Douglas et al. (2022)](https://doi.org/10.1038/s41597-022-01584-z).
+
+Since these layers are 30m resolution, downloading them for the entire state of Oregon isn't practical for the workshop. Instead we've already processed them using the same projection and resampling steps as above to match the climate data layers.
+
+These layers are already in the `data/` folder in your workspace.
+
+-   `data/forageFall.tif`
+
+-   `data/forageSpring.tif`
+
+-   `data/forageSummer.tif`
+
+-   `data/insecticide.tif`
+
+-   `data/nesting.tif`
+
+
+# 3.0 Occurrence Records
+
+## Overview
+
+-   Retrieve occurrence records for *Bombus sitkensis* from the Global Biodiversity Information Facility (GBIF)
+-   Process these records along with the environmental rasters to create presence and background points to use for fitting the species distribution model
+
+## 3.1 Use `rgbif` to get occurrence records
+
+The package `rgbif` enables you to access GBIF's API and request records downloads. Download requests are associated with a DOI, making them reproducible and citeable.
+
+Load the package
+
+```{r}
+#| message: false
+
+library(rgbif)
+
+```
+
+### Set up GBIF credentials
+
+To download from GBIF, you need to register and supply your registration credentials. More on this [here](https://docs.ropensci.org/rgbif/articles/gbif_credentials.html). Or you can use the account info that we've provided for this workshop.
+
+Once you have your credentials ready, you need to add them to your R environment. The package `usethis` has a handy function that brings up the file you need to edit to do this:
+
+```{r}
+#| eval: false
+library(usethis)
+
+usethis::edit_r_environ()
+
+```
+
+This will bring up a file called **.Renviron**. Replace your own credential information below (replace the info in quotes with your info), or you can use the account info that we will provide for this workshop. Then, copy this information into the .Renviron file and save it.
+
+```         
+GBIF_USER="your_username"
+
+GBIF_PWD="your_password"
+
+GBIF_EMAIL="youremail@gbif.org"
+```
+
+After changing the **.Renviron** file, you must **restart your R session** by running the code below.
+
+```{r}
+#| eval: false
+
+.rs.restartR()
+
+```
+
+Or, in the Rstudio menu, go to *Session \> Restart R*. If you use the menu option, make sure to reload the `rgbif` package using `library(rgbif)`.
+
+### Get the GBIF taxon key
+
+Although we can search GBIF using the scientific name, this can sometimes return poorly matched results if things like authorship information are missing. We can use the function `rgbif::name_backbone()` to identify the **GBIF taxon key** that will return precise taxon matches.
+
+```{r taxonkey}
+#| message: false
+
+name_backbone("Bombus sitkensis")
+
+```
+
+The taxon key for *Bombus sitkensis* is **1340328**.
+
+### Set up an `rgbif` query
+
+There are many query parameters available to narrow down a request for observation records. We are including a few parameters that indicate acceptable-quality data for creating robust distribution maps. These include:
+
+-   Has geographic coordinates
+-   Has no geospatial issues
+-   Has acceptable geospatial coordinate accuracy
+-   Represents the presence of the target organism
+-   Within a desired time range
+-   Represents a human observation
+-   Is within our focal geographic extent
+
+The GBIF API has specific search terms (called 'predicates' in their domain-specific language) that can specify these parameters. Below we are creating variables to store these values
+
+```{r predvars}
+
+# has geographic coordinates
+hasCoordinate <- TRUE
+
+# has no geospatial issues
+hasGeospatialIssue <- FALSE
+
+# acceptable geospatial coordinate accuracy: from 0 to 120 m accuracy
+coordinateUncertaintyInMeters <- "0,120"
+
+# occurrence status should be "PRESENT"
+occurrenceStatus <- "PRESENT"
+
+# time range is from 2015 to 2025
+year <- "2015,2025"
+
+# type of record is human observation
+basisOfRecord <- "HUMAN_OBSERVATION"
+
+# define the geographic extent
+stateProvince <- "Oregon"
+country <- "US"
+
+```
+
+Now we can use the function `rgbif::occ_count()` to preview how many GBIF records we will return if we use these search terms.
+
+```{r counts}
+
+occ_count(
+  taxonKey = 1340328,
+  hasCoordinate = hasCoordinate,
+  hasGeospatialIssue = hasGeospatialIssue,
+  coordinateUncertaintyInMeters = coordinateUncertaintyInMeters,
+  occurrenceStatus = occurrenceStatus,
+  year = year,
+  basisOfRecord = basisOfRecord,
+  stateProvince = stateProvince,
+  country = country
+)
+
+```
+
+### Make the GBIF request
+
+Now that we know everything works, we make an actual request. We can use the function `occ_download()` to actually get the data.
+
+```{r}
+#| eval: false
+
+gbif_download <- occ_download(
+  pred("taxonKey", 1340328),
+  pred("hasCoordinate", hasCoordinate),
+  pred("hasGeospatialIssue", hasGeospatialIssue),
+  pred_lte("coordinateUncertaintyInMeters",120),
+  pred_gte("coordinateUncertaintyInMeters",0),
+  pred("occurrenceStatus", occurrenceStatus),
+  pred_gte("year", 2015),
+  pred_lte("year", 2025),
+  pred_in("basisOfRecord",basisOfRecord),
+  pred("country", country),
+  pred("stateProvince",stateProvince)
+)
+
+```
+
+Note that the syntax is different from the `occ_search()` function. It makes use of `pred*` functions that define the filters we are defining using our search term variables from above. The first argument in is a key defining the filter, followed by the value.
+
+-   For example, `pred("taxonKey", 1340328)` filters for records with `taxonKey` 1340328, and
+
+-   `pred("hasCoordinate", hasCoordinate)` filters for records with `hasCoordinate` values equal to what we defined for the variable with the same name, above
+
+-   `pred_lte("coordinateUncertaintyInMeters",120)` and `pred_gte("coordinateUncertaintyInMeters",0)` indicate that the key `coordinateUncertaintyInMeters` should be "less than or equal to 120" and "greater than or equal to 0"
+
+-   Similarly, `pred_gte("year", 2015)` and `pred_lte("year", 2025)` indicate `year` should be \>= 2014 and \<= 2025
+
+We can check on the status of the download by running the download object:
+
+```{r}
+#| eval: false
+
+occ_download_wait(gbif_download)
+
+```
+
+##### Example output, once the download has succeeded:
+
+```         
+<<gbif download metadata>>
+  Status: SUCCEEDED
+  DOI: 10.15468/dl.w593th
+  Format: DWCA
+    Download key: 0013939-251025141854904
+  Created: 2025-11-03T22:09:31.716+00:00
+  Modified: 2025-11-03T22:11:28.499+00:00
+  Download link: https://api.gbif.org/v1/occurrence/download/request/0013939-251025141854904.zip
+  Total records: 204
+```
+
+Once the download is ready, we can get the data:
+
+```{r}
+#| eval: false
+
+occ <- occ_download_get(gbif_download) |> occ_download_import()
+
+```
+
+```{r}
+#| echo: false
+
+# If you are having trouble downloading the records because of concurrent requests,
+# you can use a pre-downloaded dataset in the download/ folder
+
+occ <- readRDS("download/occ.rds")
+
+```
+
+##### Citing the download
+
+We can get a citation with a doi, using the `gbif_citation` function and a *Download key* from the `gbif_download` object. An the example from the output above:
+
+```{r}
+
+gbif_citation("0013939-251025141854904")
+
+```
+
+## 3.2 Process occurrence data
+
+### Load environmental and habitat rasters
+
+The following steps require the library `terra` and the environmental and habitat layers from the last section. Load these if you don't have them in your environment already.
+
+```{r}
+#| message: false
+
+library(terra)
+
+prmean <- rast("data/prmean.tif")
+tmean_yr <- rast("data/tmean_yr.tif")
+tmax_yr <- rast("data/tmax_yr.tif")
+tmin_yr <- rast("data/tmin_yr.tif")
+elevcc <- rast("data/elevcc.tif")
+forageFall <- rast("data/forageFall.tif")
+forageSpring <- rast("data/forageSpring.tif")
+forageSummer <- rast("data/forageSummer.tif")
+nesting <- rast("data/nesting.tif")
+insecticide <- rast("data/insecticide.tif")
+
+```
+
+#### Rename rasters
+
+When making these rasters, the `terra` package automatically generates names that aren't always legible. Here we use the `names() <-` function to rename the layers to something more understandable.
+
+```{r}
+
+# rename layers for reference
+
+names(prmean) <- "prmean"
+names(tmean_yr) <- "tmean"
+names(tmax_yr) <- "tmax"
+names(tmin_yr) <- "tmin"
+names(elevcc) <- c("elev", "canopycov")
+names(forageSpring) <- "forageSpring"
+names(forageSummer) <- "forageSummer"
+names(forageFall) <- "forageFall"
+names(nesting) <- "nesting"
+names(insecticide) <- "insecticide"
+
+```
+
+### Create occurrence grid for *Bombus sitkensis*
+
+We use the coordinates of the GBIF observations to convert into georeferenced points using the `vect` function in `terra`.
+
+```{r}
+
+occ.vect <- vect(occ[,c("decimalLongitude","decimalLatitude")], 
+                 geom = c("decimalLongitude","decimalLatitude"), # x and y columns
+                 crs = "epsg:4326")  # WGS 1984 geographic coordinate system
+
+plot(occ.vect)
+
+```
+
+#### Convert the observed points to grid cells
+
+Using one of the environmental grids as a template, we convert the observation points from GBIF to a presence grid, where a grid cell value of `1` indicates that (any number of) observations were reported in that cell.
+
+```{r}
+
+occ.rast <- rasterize(occ.vect |> 
+                        terra::project(prmean),   # project points to match projection
+                      prmean                      # template raster
+                      )
+
+# rename the raster layers for reference
+
+names(occ.rast) <- "B_sitkensis"
+
+plot(occ.rast, col = "blue")
+
+```
+
+#### Combine presence grid with environment and habitat variables and extract to table
+
+We only need a table of presence grid cells and their associated habitat and environmental values. To do this, we can stack all the raster layers together (since they share the same projection and their grids are aligned). Then we can use the `terra` `values` function to extract the cell values of the stacked grids as rows in a table, keeping only the rows with *B. sitkensis* presences using the `filter` function from `dplyr`.
+
+```{r}
+#| message: false
+
+library(dplyr)
+
+# stack then environmental and habitat layers and the rasterized occurence points
+
+occ.envr <- rast(list(prmean, tmean_yr, tmax_yr, tmin_yr, elevcc, forageFall,
+                      forageSpring, forageSummer, nesting, insecticide, occ.rast))
+
+
+presence <- as.data.frame(occ.envr, xy = TRUE) |> 
+  na.omit()   # drop rows where B_sitkensis occurence is NA
+
+```
+
+### Create background points grid
+
+Background samples are obtained randomly and independently of species locations. Background points are meant to sample the full environmental space available to the species of interest in the region. This means that background points:
+
+-   should be numerous enough to represent the environmental variation across the region
+-   may overlap with the presence points
+
+The package `predicts` has a function that is useful for creating background points, `backgroundSample`.
+
+```{r}
+library(predicts)
+
+set.seed(100)   # background sampling is random. Setting seed to 100 ensures we get the same results
+
+backgroundpts <- backgroundSample(
+  mask = forageFall,           # mask restricts points to area of interest (defined by the forageFall)
+  n = 10000,                   # create 10000 background points
+)
+
+background <- terra::extract(occ.envr[[1:11]],    # only extracting the environmental/habitat layers
+                      backgroundpts               # extraction locations
+                      )
+
+# combine presence and background data
+
+presback <- bind_rows(presence, background) |>
+  mutate(B_sitkensis = ifelse(is.na(B_sitkensis), 0, B_sitkensis))   # replace NA (from background data) with 0
+
+```
+
+Save the output!
+
+```{r}
+#| eval: false
+
+saveRDS(presback, "data/presback.rds")
+saveRDS(occ.envr, "data/occ.envr.rds")
+
+```
+
+
+# 4.0 Species Distribution Model with Random Forest
+
+## Overview
+
+In this module, you'll build and evaluate a species distribution model
+for *Bombus sitkensis* using a Random Forest algorithm. You'll also
+generate spatial predictions, evaluate model performance, and visualize
+variable importance and response curves.
+
+## QUICK Niche Theory Refresher
+
+Today, we will be focusing on Abiotic (A) and Biotic (B) factors, but we
+will not incorporate Movement (M). Movement and the accessible area is a
+key component to building species distribution models and should be
+addressed thoughtfully. For speed and computational reasons, we will not
+be fitting our models using occurrence records from throughout the
+species range, but when possible, SDMs should be fit using data from
+throughout a species' entire native range.
+
+![BAM Diagram, Soberón 2007 *Ecology
+Letters*](media/BAM_Diagram.png){width="300"}
+
+## 4.1 Read and prepare data
+
+We’ll load the presence/background dataset and rename the response
+variable. Then we’ll split the data into training (80%) and testing
+(20%) sets, stratified by presence.
+
+```{r, message=FALSE}
+
+library(dplyr)         # Data manipulation
+library(tidymodels)    # Framework for modeling workflows and tuning
+
+# Load presence-background data and rename target variable
+pb <- readRDS("data/presback.rds") %>%
+  rename(presence = B_sitkensis)
+
+# Convert presence column to a factor (required for classification)
+pb$presence <- as.factor(pb$presence)
+
+# Create a train/test split (80% train, 20% test) stratified by presence
+set.seed(123)
+data_split <- initial_split(pb, prop = 0.8, strata = presence)
+train_data <- training(data_split)
+test_data <- testing(data_split)
+```
+
+## 4.2 Plot spatial extent and points
+
+We’ll visualize the training and test points over the study area
+(Oregon) for context.
+
+```{r, message=FALSE}
+
+library(sf)            # For working with vector spatial data (shapefiles, etc.)
+library(terra)         # For raster data handling
+library(ggplot2)       # For visualization
+
+# Load raster for projection reference
+tmean_yr <- rast("data/tmean_yr.tif")
+
+# Load shapefile of Oregon and convert to sf object
+or <- vect("data/Oregon.shp") %>% 
+  st_as_sf()
+
+# Visualize training and testing data points on the map
+# Blue = training, Gold = testing
+
+ggplot() +
+  geom_sf(data = or, fill = NA) +
+  geom_point(data = train_data, aes(x = x, y = y), color = "blue") +
+  geom_point(data = test_data, aes(x = x, y = y), color = "gold") +
+  theme_minimal() +
+  labs(title = "Training and Test Points", x = "Longitude", y = "Latitude")
+```
+
+## 4.3 Preprocessing recipe
+
+We’ll create a tidymodels recipe that defines the model formula and
+normalization of predictors.
+
+In tidymodels, a 'recipe' is a structured sequence of preprocessing
+steps applied to data before modeling. It allows users to define
+transformations (e.g., normalization, encoding, imputation) in a
+reproducible way. Recipes separate data preparation from model fitting,
+ensuring consistent preprocessing across training and test sets. Here we
+include normalization of predictors, which scales variables so that they
+are on comparable ranges.
+
+We're not worrying about correlation today, because our focus is
+prediction, but if interpreting response curves or variable importance
+were a key outcome of the model, we would need to think more carefully
+about dealing with correlated variables.
+
+```{r, message=FALSE}
+
+library(themis)        # For handling class imbalance
+
+# Define modeling recipe specifying predictors and target variable
+rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
+                      canopycov + forageFall + forageSpring +
+                      forageSummer + nesting + insecticide,
+                    data = train_data) %>%
+  step_downsample(presence) %>% #removes rows of a dataset to make factor levels equal  
+  step_normalize(all_predictors())  # Normalize predictors (optional for RF)
+```
+
+## 4.4 Model specification
+
+We define a Random Forest model and specify parameters (mtry, min_n) for
+tuning. The engine ranger is fast and supports permutation-based
+variable importance.
+
+```{r}
+library(ranger)
+# Define a Random Forest model using the parsnip package
+# 'tune()' allows tuning of hyperparameters during cross-validation
+rf_model <- rand_forest(
+  mtry = tune(),
+  min_n = tune(),
+  trees = 500
+) %>%
+  set_engine("ranger", importance = "permutation") %>% # model engine specifies that the method of estimation, which is the ranger package
+  set_mode("classification")
+```
+
+## 4.5. Workflow and tuning
+
+We’ll combine the recipe and model into a workflow, then use 5-fold
+cross-validation to tune parameters.
+
+This step will take a few minutes to process.
+
+```{r, message=FALSE}
+# Combine recipe and model into a single workflow
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(rf_recipe)
+
+# Create 5-fold cross-validation folds
+set.seed(234)
+cv_folds <- vfold_cv(train_data, v = 5, strata = presence)
+
+# Define random grid for hyperparameter tuning
+# 'mtry' controls how many predictors are randomly selected at each tree split — smaller values increase randomness.
+# 'min_n' sets the minimum number of observations in a terminal node (a smaller value allows deeper trees).
+# Tuning these parameters helps balance model complexity and generalization.
+rf_grid <- grid_random(
+  mtry(range = c(1, 9)),
+  min_n(range = c(5, 20)),
+  size = 10
+)
+
+# Tune the model using ROC AUC as performance metric
+set.seed(345)
+tuned_rf <- tune_grid(
+  rf_workflow,
+  resamples = cv_folds,
+  grid = rf_grid,
+  metrics = metric_set(roc_auc),
+  control = control_grid(save_pred = TRUE,
+                         verbose = TRUE)
+)
+
+# Select best parameters by highest ROC AUC
+best_params <- select_best(tuned_rf, metric = "roc_auc")
+
+# Finalize workflow with best hyperparameters
+final_rf_workflow <- finalize_workflow(rf_workflow, best_params)
+```
+
+## 4.6. Fit final model
+
+Fit the finalized Random Forest model to the training data.
+
+```{r}
+# Fit the final model to the full training dataset
+final_rf_fit <- fit(final_rf_workflow, data = train_data)
+```
+
+## 4.7 Evaluate on test set
+
+We’ll generate predictions for the test data and compute AUC and a ROC
+curve.
+
+The AUC (Area Under the ROC Curve) measures the model's ability to
+discriminate between classes. A value of 0.5 indicates random guessing,
+while 1.0 indicates perfect discrimination.
+
+The ROC (Receiver Operating Characteristic) curve shows the tradeoff
+between True Positive Rate (sensitivity) and False Positive Rate (1 -
+specificity) across different threshold values. A model with curves
+closer to the top-left corner performs better.
+
+```{r, message=FALSE}
+
+library(pROC)          # For calculating and plotting ROC curves
+
+# Predict probabilities on test set
+rf_predictions <- predict(final_rf_fit, test_data, type = "prob") %>%
+  bind_cols(test_data)
+
+# Plot ROC curve
+roc_obj <- roc(test_data$presence, rf_predictions$.pred_1)
+plot(roc_obj, col = "blue", lwd = 2, main = "ROC Curve - Random Forest")
+cat("AUC:", round(auc(roc_obj), 3), "\n")
+```
+
+## 4.8 Predict to entire extent
+
+We’ll now predict probabilities across the entire study region to create
+a distribution map.
+
+```{r}
+# Load environmental raster data
+occ.envr <- readRDS("data/occ.envr.rds")
+
+# Prepare data for prediction by removing NAs and target variable
+prediction_df <- as.data.frame(occ.envr, xy = TRUE) %>%
+  select(-B_sitkensis) %>%
+  na.omit()
+
+# Predict probability of presence across the landscape
+predictions_on_map <- predict(final_rf_fit, new_data = prediction_df, type = "prob")
+
+prediction_df2 <- prediction_df %>%
+  mutate(pred = predictions_on_map$.pred_1)
+
+# Visualize predictions as a raster map
+ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Predicted Probability of Presence", fill = "Probability")
+
+# make prediction_df2 into a tif
+#sdm_rast <- prediction_df2 %>% 
+#  select(x,y,pred) %>% 
+#  rast(type = "xyz")
+#
+#writeRaster(sdm_rast, "data/sdm_rast.tif")
+```
+
+## 4.9. Continuous Boyce Index
+
+The Boyce Index evaluates how well predicted suitability values match
+observed presences.
+
+It is typically used for presence-only or presence-background models,
+like many SDMs. Values range from -1 to +1: - +1 indicates perfect
+agreement (model predicts presences in high-suitability areas), - 0
+means random prediction, and -1 indicates counter-predictive performance
+(presences fall in low-suitability areas).
+
+```{r, message=FALSE}
+
+library(ecospat)       # For calculating the Boyce Index
+
+# Evaluate model calibration using the Continuous Boyce Index
+presence_preds <- rf_predictions %>%
+  filter(presence == 1) %>%
+  pull(.pred_1)
+
+background_preds <- prediction_df2$pred
+
+# The Boyce plot (automatically generated by ecospat.boyce) shows predicted suitability values on the x-axis and their frequency ratio (P/E) on the y-axis. A rising curve suggests better predictions, where presences are concentrated in high-suitability areas predicted by the model.
+
+boyce_result <- ecospat.boyce(
+  fit = background_preds,
+  obs = presence_preds,
+  window.w = "default",
+  res = 100
+)
+
+cat("Continuous Boyce Index: ", round(boyce_result$cor, 3), "\n")
+```
+
+## 4.10 Variable Importance
+
+We extract and visualize variable importance from the fitted model.
+
+```{r}
+# Extract fitted model to access variable importance
+rf_final_model <- extract_fit_parsnip(final_rf_fit)$fit
+vip <- tibble::enframe(rf_final_model$variable.importance, name = "variable", value = "importance") %>%
+  arrange(desc(importance))
+
+# Plot variable importance
+ggplot(vip, aes(x = reorder(variable, importance), y = importance)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Variable Importance", x = "Variable", y = "Importance")
+```
+
+## 4.11 Response Curves
+
+Response curves show how predicted probability changes as one variable
+varies, keeping others constant.
+
+```{r}
+# Function to generate a smooth response curve for a given variable
+predict_response_curve <- function(var_name, model, data, n = 100) {
+  var_range <- seq(min(data[[var_name]], na.rm = TRUE),
+                   max(data[[var_name]], na.rm = TRUE), length.out = n)
+  
+  base_data <- data %>%
+    summarise(across(c(prmean, tmean, tmax, tmin, elev, 
+                       canopycov, forageFall, forageSpring, 
+                       forageSummer, nesting, insecticide),
+                     median, na.rm = TRUE))
+  
+  response_data <- base_data[rep(1, n), ]
+  response_data[[var_name]] <- var_range
+  
+  preds <- predict(model, new_data = response_data, type = "prob")$.pred_1
+  
+  tibble(value = var_range, prob = preds, variable = var_name)
+}
+
+# Create response curves for each predictor
+predictor_vars <- c("prmean","tmean","tmax", "tmin", "elev",
+                    "canopycov", "forageFall", "forageSpring",
+                    "forageSummer", "nesting", "insecticide")
+
+response_curves <- map_dfr(predictor_vars, function(var) {
+  predict_response_curve(var, final_rf_fit, train_data)
+})
+
+# Plot response curves
+ggplot(response_curves, aes(x = value, y = prob)) +
+  geom_smooth(method = "loess", formula = y ~ x, se = FALSE, color = "darkgreen") +
+  facet_wrap(~ variable, scales = "free_x") +
+  labs(title = "Smoothed Response Curves", x = "Predictor Value", y = "Predicted Probability") +
+  theme_minimal()
+```
+
+
+
