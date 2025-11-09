@@ -359,7 +359,6 @@ These layers are already in the `data/` folder in your workspace.
 
 -   `data/nesting.tif`
 
-
 # 3.0 Occurrence Records
 
 ## Overview
@@ -709,34 +708,21 @@ saveRDS(occ.envr, "data/occ.envr.rds")
 
 ```
 
-
 # 4.0 Species Distribution Model with Random Forest
 
 ## Overview
 
-In this module, you'll build and evaluate a species distribution model
-for *Bombus sitkensis* using a Random Forest algorithm. You'll also
-generate spatial predictions, evaluate model performance, and visualize
-variable importance and response curves.
+In this module, you'll build and evaluate a species distribution model for *Bombus sitkensis* using a Random Forest algorithm. You'll also generate spatial predictions, evaluate model performance, and visualize variable importance and response curves.
 
 ## QUICK Niche Theory Refresher
 
-Today, we will be focusing on Abiotic (A) and Biotic (B) factors, but we
-will not incorporate Movement (M). Movement and the accessible area is a
-key component to building species distribution models and should be
-addressed thoughtfully. For speed and computational reasons, we will not
-be fitting our models using occurrence records from throughout the
-species range, but when possible, SDMs should be fit using data from
-throughout a species' entire native range.
+Today, we will be focusing on Abiotic (A) and Biotic (B) factors, but we will not incorporate Movement (M). Movement and the accessible area is a key component to building species distribution models and should be addressed thoughtfully. For speed and computational reasons, we will not be fitting our models using occurrence records from throughout the species range, but when possible, SDMs should be fit using data from throughout a species' entire native range.
 
-![BAM Diagram, Soberón 2007 *Ecology
-Letters*](media/BAM_Diagram.png){width="300"}
+![BAM Diagram, Soberón 2007 *Ecology Letters*](media/BAM_Diagram.png){width="300"}
 
 ## 4.1 Read and prepare data
 
-We’ll load the presence/background dataset and rename the response
-variable. Then we’ll split the data into training (80%) and testing
-(20%) sets, stratified by presence.
+We’ll load the presence/background dataset and rename the response variable. Then we’ll split the data into training (80%) and testing (20%) sets, stratified by presence.
 
 ```{r, message=FALSE}
 
@@ -759,8 +745,7 @@ test_data <- testing(data_split)
 
 ## 4.2 Plot spatial extent and points
 
-We’ll visualize the training and test points over the study area
-(Oregon) for context.
+We’ll visualize the training and test points over the study area (Oregon) for context.
 
 ```{r, message=FALSE}
 
@@ -788,21 +773,11 @@ ggplot() +
 
 ## 4.3 Preprocessing recipe
 
-We’ll create a tidymodels recipe that defines the model formula and
-normalization of predictors.
+We’ll create a tidymodels recipe that defines the model formula and normalization of predictors.
 
-In tidymodels, a 'recipe' is a structured sequence of preprocessing
-steps applied to data before modeling. It allows users to define
-transformations (e.g., normalization, encoding, imputation) in a
-reproducible way. Recipes separate data preparation from model fitting,
-ensuring consistent preprocessing across training and test sets. Here we
-include normalization of predictors, which scales variables so that they
-are on comparable ranges.
+In tidymodels, a 'recipe' is a structured sequence of preprocessing steps applied to data before modeling. It allows users to define transformations (e.g., normalization, encoding, imputation) in a reproducible way. Recipes separate data preparation from model fitting, ensuring consistent preprocessing across training and test sets. Here we include normalization of predictors, which scales variables so that they are on comparable ranges.
 
-We're not worrying about correlation today, because our focus is
-prediction, but if interpreting response curves or variable importance
-were a key outcome of the model, we would need to think more carefully
-about dealing with correlated variables.
+We're not worrying about correlation today, because our focus is prediction, but if interpreting response curves or variable importance were a key outcome of the model, we would need to think more carefully about dealing with correlated variables.
 
 ```{r, message=FALSE}
 
@@ -819,9 +794,7 @@ rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
 
 ## 4.4 Model specification
 
-We define a Random Forest model and specify parameters (mtry, min_n) for
-tuning. The engine ranger is fast and supports permutation-based
-variable importance.
+We define a Random Forest model and specify parameters (mtry, min_n) for tuning. The engine ranger is fast and supports permutation-based variable importance.
 
 ```{r}
 library(ranger)
@@ -838,8 +811,7 @@ rf_model <- rand_forest(
 
 ## 4.5. Workflow and tuning
 
-We’ll combine the recipe and model into a workflow, then use 5-fold
-cross-validation to tune parameters.
+We’ll combine the recipe and model into a workflow, then use 5-fold cross-validation to tune parameters.
 
 This step will take a few minutes to process.
 
@@ -892,17 +864,11 @@ final_rf_fit <- fit(final_rf_workflow, data = train_data)
 
 ## 4.7 Evaluate on test set
 
-We’ll generate predictions for the test data and compute AUC and a ROC
-curve.
+We’ll generate predictions for the test data and compute AUC and a ROC curve.
 
-The AUC (Area Under the ROC Curve) measures the model's ability to
-discriminate between classes. A value of 0.5 indicates random guessing,
-while 1.0 indicates perfect discrimination.
+The AUC (Area Under the ROC Curve) measures the model's ability to discriminate between classes. A value of 0.5 indicates random guessing, while 1.0 indicates perfect discrimination.
 
-The ROC (Receiver Operating Characteristic) curve shows the tradeoff
-between True Positive Rate (sensitivity) and False Positive Rate (1 -
-specificity) across different threshold values. A model with curves
-closer to the top-left corner performs better.
+The ROC (Receiver Operating Characteristic) curve shows the tradeoff between True Positive Rate (sensitivity) and False Positive Rate (1 - specificity) across different threshold values. A model with curves closer to the top-left corner performs better.
 
 ```{r, message=FALSE}
 
@@ -920,8 +886,7 @@ cat("AUC:", round(auc(roc_obj), 3), "\n")
 
 ## 4.8 Predict to entire extent
 
-We’ll now predict probabilities across the entire study region to create
-a distribution map.
+We’ll now predict probabilities across the entire study region to create a distribution map.
 
 ```{r}
 # Load environmental raster data
@@ -956,14 +921,9 @@ ggplot(prediction_df2, aes(x = x, y = y, fill = pred)) +
 
 ## 4.9. Continuous Boyce Index
 
-The Boyce Index evaluates how well predicted suitability values match
-observed presences.
+The Boyce Index evaluates how well predicted suitability values match observed presences.
 
-It is typically used for presence-only or presence-background models,
-like many SDMs. Values range from -1 to +1: - +1 indicates perfect
-agreement (model predicts presences in high-suitability areas), - 0
-means random prediction, and -1 indicates counter-predictive performance
-(presences fall in low-suitability areas).
+It is typically used for presence-only or presence-background models, like many SDMs. Values range from -1 to +1: - +1 indicates perfect agreement (model predicts presences in high-suitability areas), - 0 means random prediction, and -1 indicates counter-predictive performance (presences fall in low-suitability areas).
 
 ```{r, message=FALSE}
 
@@ -1008,8 +968,7 @@ ggplot(vip, aes(x = reorder(variable, importance), y = importance)) +
 
 ## 4.11 Response Curves
 
-Response curves show how predicted probability changes as one variable
-varies, keeping others constant.
+Response curves show how predicted probability changes as one variable varies, keeping others constant.
 
 ```{r}
 # Function to generate a smooth response curve for a given variable
@@ -1047,6 +1006,3 @@ ggplot(response_curves, aes(x = value, y = prob)) +
   labs(title = "Smoothed Response Curves", x = "Predictor Value", y = "Predicted Probability") +
   theme_minimal()
 ```
-
-
-
