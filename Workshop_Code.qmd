@@ -792,6 +792,12 @@ rf_recipe <- recipe(presence ~ prmean + tmean + tmax + tmin + elev +
   step_normalize(all_predictors())  # Normalize predictors (optional for RF)
 ```
 
+::: callout-caution
+## Downsampling
+
+The model we built here is a bit of an oversimplification for the purposes of this demonstration. If you were to use a random forest for distribution modeling, you would not want to use `step_downsample()`. Instead you could consider using a true balanced random forest (also sometimes called a "down-sampled random forest") to address class imbalance. In this code `step_downsample()` randomly selects a number of background points equal to the number of presence points and this same set of points is used across all trees. In a true balanced random forest a subset of points is randomly selected within each tree. You can learn more about this approach [here](https://doi.org/10.1111/ecog.05615).
+:::
+
 ## 4.4 Model specification
 
 We define a Random Forest model and specify parameters (mtry, min_n) for tuning. The engine ranger is fast and supports permutation-based variable importance.
